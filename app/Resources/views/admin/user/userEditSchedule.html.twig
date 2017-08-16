@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% set months = [
+        { 'label': 'Mai 2017', 'number': 5 },
+        { 'label': 'Juin 2017', 'number': 6 },
+        { 'label': 'Juillet 2017', 'number': 7 },
+        { 'label': 'Août 2017', 'number': 8 },
+        { 'label': 'Septembre 2017', 'number': 9 },
+    ]
+%}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <h3 class="text-center">{{ user.firstname }} {{ user.lastname }}</h3>
+            <h4 class="text-center">Planning</h4>
+
+            <form method="post" class="form">
+                <div class="row">
+                    {% for month in months %}
+                        <div class="col col-2 {% if loop.first %}offset-1{% endif %}">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>{{ month.label }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cinescenie in cinescenies %}
+                                        {% if cinescenie.date|date("m") == month.number %}
+                                            {% set activityId = '' %}
+                                            {% set activityName = '' %}
+                                            {% set presence = false %}
+                                            {% set scheduleId = '' %}
+                                            {% for schedule in cinescenie.schedules %}
+                                                {% if schedule.user == user and schedule.activity %}{% set activityId = schedule.activity.id %}{% set activityName = schedule.activity.name %}{% endif %}
+                                                {% if schedule.user == user %}{% set presence = true %}{% set scheduleId = schedule.id %}{% endif %}
+                                            {% endfor %}
+
+                                            <tr>
+                                                <td>
+                                                    <div class="row gutters">
+                                                        <div class="col col-2">
+                                                            <div class="form-item">
+                                                                {% if cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_VALIDATE') %}
+                                                                    {% if presence %}
+                                                                        <i class="fa fa-check green"></i>
+                                                                    {% else %}
+                                                                        <i class="fa fa-times red"></i>
+                                                                    {% endif %}
+                                                                {% else %}
+                                                                    <input name="cinescenie_{{ cinescenie.id }}" type="checkbox" {% if presence %}checked{% endif %}>
+                                                                {% endif %}
+                                                            </div>
+                                                        </div>
+                                                        <div class="col col-10">
+                                                            {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d')|capitalize }}
+                                                            {% if activityName %}
+                                                                <br>
+                                                                <b>{{ activityName }}</b>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-item text-right">
+                    <a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button secondary outline">Retour</a>
+                    <button type="submit">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

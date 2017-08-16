@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>{% block title %}Welcome!{% endblock %}</title>
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('assets/css/kube.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/kube.site.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/css/neopter.css') }}">
+            <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body>
+        {% block body %}
+            {% block menu %}
+                {% include 'menu.html.twig' %}
+
+                {% block submenu %}{% endblock %}
+            {% endblock %}
+
+            {% block content %}{% endblock %}
+
+            {% block footer %}
+                <footer id="footer">
+                    <nav>
+                    	<ul>
+                			<li><a href="/redactor/">Redactor</a></li>
+                			<li><a href="/grafs/">Grafs</a></li>
+                			<li><span>Kube</span></li>
+                			<li><a href="/company/">Company</a></li>
+                			<li><a href="/blog/">Blog</a></li>
+                			<li><a href="http://twitter.com/imperavi">Follow us on Twitter</a></li>
+                        </ul>
+                    </nav>
+                    <p>© Neoteam 2017. Tous droits réservés.</p>
+                </footer>
+            {% endblock %}
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+            <script src="{{ asset('assets/js/kube.js') }}"></script>
+        {% endblock %}
+    </body>
+</html>

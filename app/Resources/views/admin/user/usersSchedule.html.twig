@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            {% for flash_message in app.session.flashBag.get('notice') %}
+              <div class="message success" data-component="message">
+                  {{ flash_message }} <span class="close small"></span>
+              </div>
+            {% endfor %}
+
+            <div class="message focus" data-component="message">
+                Vous avez {{ cineToValidate }} Cinéscénie(s) à valider <span class="close small"></span>
+            </div>
+
+            <h4 class="text-center">Dates à venir</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Présence</th>
+                        <th>Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cinescenie in cinescenies %}
+                        {% if cinescenie.date|date('ymd') >= 'now'|date('ymd') %}
+                            <tr>
+                                <td class="w10">{{ cinescenie.date|date("d/m/y") }}</td>
+                                <td class="w70">
+                                    {% for schedule in cinescenie.schedules %}
+                                        <a href="{{ path('userGeneral', {'userSlug': schedule.user.username}) }}">{{ schedule.user.firstname }} {{ schedule.user.lastname|first }}</a>{% if schedule.activity %} ({{ schedule.activity.name }}){% endif %}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td class="w10 text-right">{{ cinescenie.schedules|length }}</td>
+                                <td class="w10 text-right">
+                                    {% if cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_VALIDATE') %}
+                                        <i class="fa fa-check green fa-2x"></i>
+                                    {% elseif cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_DRAFT') %}
+                                        <a href="{{ path('usersScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4 class="text-center">Dates passées</h4>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Présence</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cinescenie in cinescenies %}
+                        {% if cinescenie.date|date('ymd') < 'now'|date('ymd') %}
+                            <tr>
+                                <td class="w10">{{ cinescenie.date|date("d/m/y") }}</td>
+                                <td class="w70">
+                                    {% for schedule in cinescenie.schedules %}
+                                        <a href="{{ path('userGeneral', {'userSlug': schedule.user.username}) }}">{{ schedule.user.firstname }} {{ schedule.user.lastname|first }}</a>{% if schedule.activity %} ({{ schedule.activity.name }}){% endif %}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td class="w10 text-right">{{ cinescenie.schedules|length }}</td>
+                                <td class="w10 text-right">
+                                    {% if cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_VALIDATE') %}
+                                        <i class="fa fa-check green fa-2x"></i>
+                                    {% else %}
+                                        <a href="{{ path('usersScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

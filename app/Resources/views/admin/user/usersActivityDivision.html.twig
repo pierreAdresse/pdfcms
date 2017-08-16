@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <form method="post" class="form">
+                <p>Veuillez choisir la date de la Cinéscénie</p>
+                <div class="form-item">
+                    <select name="select_cinescenie" class="w20">
+                        {% for cinescenie in cinescenies %}
+                            <option value="cinescenie_{{ cinescenie.id }}">{{ cinescenie.date|date('d/m/y') }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-item">
+                    <button type="submit">Lancer la répartition des rôles</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

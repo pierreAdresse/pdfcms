@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <h3 class="text-center">{{ user.firstname }} {{ user.lastname }}</h3>
+            <h4 class="text-center">Informations personnelles</h4>
+
+            {{ form_start(form) }}
+                <table>
+                    <tbody>
+                        <tr>
+                            <td class="w50">Prénom</td>
+                            <td class="w50">
+                                <div class="form-item">
+                                    {{ form_widget(form.firstname) }}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w50">Nom</td>
+                            <td class="w50">
+                                <div class="form-item">
+                                    {{ form_widget(form.lastname) }}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w50">Email</td>
+                            <td class="w50">
+                                <div class="form-item">
+                                    {{ form_widget(form.email) }}
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="w50">Téléphone</td>
+                            <td class="w50">
+                                <div class="form-item">
+                                    {{ form_widget(form.phone) }}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="form-item text-right">
+                    <a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button secondary outline">Retour</a>
+                    <button type="submit">Enregistrer</button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

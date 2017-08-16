@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% set months = [
+        { 'label': 'Mai 2017', 'number': 5 },
+        { 'label': 'Juin 2017', 'number': 6 },
+        { 'label': 'Juillet 2017', 'number': 7 },
+        { 'label': 'Août 2017', 'number': 8 },
+        { 'label': 'Septembre 2017', 'number': 9 },
+    ]
+%}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <h3 class="text-center">{{ user.firstname }} {{ user.lastname }}</h3>
+
+            {% for flash_message in app.session.flashBag.get('notice') %}
+              <div class="message success" data-component="message">
+                  {{ flash_message }} <span class="close small"></span>
+              </div>
+            {% endfor %}
+
+            <h4 class="text-center">Informations personnelles</h4>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td class="w50">Prénom</td>
+                        <td class="w50">{{ user.firstname }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w50">Nom</td>
+                        <td class="w50">{{ user.lastname }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w50">Email</td>
+                        <td class="w50">{{ user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td class="w50">Téléphone</td>
+                        <td class="w50">{{ user.phone }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="text-right"><a href="{{ path('userEditAccount', {'userSlug': user.username}) }}">Modifier les informations personnelles</a></p>
+
+            <h4 class="text-center">Planning</h4>
+
+            <div class="row">
+                {% for month in months %}
+                    <div class="col col-2 {% if loop.first %}offset-1{% endif %}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>{{ month.label }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cinescenie in cinescenies %}
+                                    {% if cinescenie.date|date("m") == month.number %}
+                                        {% set activityName = '' %}
+                                        {% set presence = false %}
+                                        {% for schedule in cinescenie.schedules %}
+                                            {% if schedule.user == user and schedule.activity %}{% set activityName = schedule.activity.name %}{% endif %}
+                                            {% if schedule.user == user %}{% set presence = true %}{% endif %}
+                                        {% endfor %}
+
+                                        <tr>
+                                            <td>
+                                                <div class="row gutters">
+                                                    <div class="col col-2">
+                                                        {% if presence %}
+                                                            <i class="fa fa-check green"></i>
+                                                        {% else %}
+                                                            <i class="fa fa-times red"></i>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="col col-10">
+                                                        {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d')|capitalize }}
+                                                        {% if activityName %}
+                                                            <br />
+                                                            <b>{{ activityName }}</b>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+            <p class="text-right"><a href="{{ path('userEditSchedule', {'userSlug': user.username}) }}">Modifier le planning</a></p>
+
+            <h4 class="text-center">Compétences</h4>
+
+            <table>
+                <tbody>
+                    {% for skill in skills %}
+                      <tr>
+                          <td class="w50">{{ skill.name }}</td>
+                          <td class="w50">
+                            {% set presence = false %}
+                            {% for userSkill in user.userSkills %}
+                                {% if skill == userSkill.skill %}{% set presence = true %}{% endif %}
+                            {% endfor %}
+                            {% if presence %}<i class="fa fa-check green"></i>{% else %}<i class="fa fa-times red"></i>{% endif %}
+                          </td>
+                      </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-right"><a href="{{ path('userEditSkills', {'userSlug': user.username}) }}">Modifier les compétences</a></p>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{#
+{% block submenu %}
+    <nav id="subnav">
+        <ul>
+            <li><b>Générales</b></li>
+            <li><a href="#">Comptes rendus</a></li>
+    	    <li><a href="#">Menu</a></li>
+        </ul>
+    </nav>
+{% endblock %}
+#}
+
+{% block content %}
+
+    <div id="main">
+        {#
+        <div id="hero">
+            <h1>.</h1>
+        </div>
+        #}
+
+        <div id="kube-component" class="content">
+            <h3><a href="">Actualité titre 1</a></h3>
+            <p>Typography of Kube based on the 4px horizontal grid, it means that for the headers, paragraphs, quotes and any other texts chosen are a combination of line-height, that fit into the 4px grid and help set the horizontal rhythm of design by default.</p>
+            <p class="text-right smaller">Publié par Pierre Bertaud le 13/07/2017 à 16h34<br/><a href="">Voir les commentaires (3)</a></p>
+
+            <h3>Actualité titre 2</h3>
+            <p>Typography of Kube based on the 4px horizontal grid, it means that for the headers, paragraphs, quotes and any other texts chosen are a combination of line-height, that fit into the 4px grid and help set the horizontal rhythm of design by default.</p>
+            <p></p>
+            <p class="text-right small">Publié par Pierre Bertaud<br/>le 13/07/2017 à 16h34</p>
+
+            <nav class="pagination align-center">
+                <ul>
+                    <li class="prev"><a href="">&larr;</a></li>
+                    <li>
+                        <ul>
+                            <li class="active"><a href="#">1</a></li>
+                            <li><a href="">2</a></li>
+                        </ul>
+                    </li>
+                    <li class="next"><a href="">&rarr;</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+{% endblock %}

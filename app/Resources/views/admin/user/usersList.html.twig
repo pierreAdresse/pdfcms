@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <div class="form-item">
+              <input type="text" id="searchUser" onkeyup="searchUser()" placeholder="Rechercher un utilisateur">
+            </div>
+            <div id="contentDivUser" class="row gutters">
+                {% for user in users %}
+                    <div class="col col-4 user">
+                        <a href="{{ path('userGeneral', {'userSlug': user.username}) }}">{{ user.firstname }} {{ user.lastname }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+  function searchUser() {
+    // Declare variables
+    var input, filter, table, divUser, td, i;
+    input = document.getElementById("searchUser");
+    filter = input.value.toUpperCase();
+    contentDivUser = document.getElementById("contentDivUser");
+    divUser = contentDivUser.getElementsByTagName("div");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < divUser.length; i++) {
+      a = divUser[i].getElementsByTagName("a")[0];
+      if (a) {
+        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          divUser[i].style.display = "";
+        } else {
+          divUser[i].style.display = "none";
+        }
+      }
+    }
+  }
+  </script>
+{% endblock %}

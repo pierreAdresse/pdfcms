@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <h3 class="text-center">{{ user.firstname }} {{ user.lastname }}</h3>
+            <h4 class="text-center">Planning</h4>
+
+            <form method="post" class="form">
+                <table>
+                    <tbody>
+                        {% for skill in skills %}
+                          <tr>
+                              <td class="w50">{{ skill.name }}</td>
+                              <td class="w50">
+                                {% set presence = false %}
+                                {% for userSkill in user.userSkills %}
+                                    {% if skill == userSkill.skill %}{% set presence = true %}{% endif %}
+                                {% endfor %}
+                                <div class="form-item">
+                                    <input name="skill_{{ skill.id }}" type="checkbox" {% if presence %}checked{% endif %}>
+                                </div>
+                              </td>
+                          </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="form-item text-right">
+                    <a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button secondary outline">Retour</a>
+                    <button type="submit">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

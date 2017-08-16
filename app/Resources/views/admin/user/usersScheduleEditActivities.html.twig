@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block submenu %}
+    {% include 'admin/user/usersSubmenu.html.twig' %}
+{% endblock %}
+
+{% block content %}
+    <div id="main">
+        <div id="kube-component" class="content">
+            <h4 class="text-center">Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y') }}</h4>
+
+            {% for flash_message in app.session.flashBag.get('notice') %}
+              <div class="message success" data-component="message">
+                  {{ flash_message }} <span class="close small"></span>
+              </div>
+            {% endfor %}
+
+            <form method="post" class="form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Rôle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for schedule in schedules %}
+                            <tr>
+                                <td class="w50">{{ schedule.user.firstname }} {{ schedule.user.lastname }}</td>
+                                <td class="w50">
+                                    <div class="form-item">
+                                        <select name="schedule_{{ schedule.id }}">
+                                            <option value=""{% if schedule.activity is empty %} selected{% endif %}></option>
+                                            {% for activity in activities %}
+                                                <option value="activity_{{ activity.id }}"{% if schedule.activity and activity.id == schedule.activity.id %} selected{% endif %}>{{ activity.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="form-item text-right">
+                    <a href="{{ path('usersSchedule') }}" class="button secondary outline">Retour</a>
+                    <button type="submit">{% if cinescenie.date|date('ymd') < 'now'|date('ymd') %}Enregistrer et valider{% else %}Enregistrer{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

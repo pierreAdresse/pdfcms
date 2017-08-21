@@ -36,4 +36,21 @@ class UserRepository extends \Doctrine\ORM\EntityRepository
 
         return $users;
     }
+
+    public function getAndCountSchedules()
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT u, COUNT(sc.id) AS countSchedules
+            FROM AppBundle:User u
+            JOIN u.schedules sc WITH (sc.user = u)
+            GROUP BY u.id
+            ORDER BY u.firstname ASC
+            '
+        );
+        $users = $query->getResult();
+
+        return $users;
+    }
 }

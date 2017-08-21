@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <div class="form-item">
+        <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for events...">
+    </div>
+
+    <table class="" id="myTable">
+        <thead>
+            <tr>
+                <th class="w10">Date</th>
+                <th class="w30">Evénement</th>
+                <th class="w30">Lieu</th>
+                <th class="w30">Distance</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="w10">03/05/2017</td>
+                <td class="w30">Repas à thème</td>
+                <td class="w30">Saint Vincent Sterlanges</td>
+                <td class="w30">0 km</td>
+            </tr>
+            <tr>
+                <td class="w10">03/05/2017</td>
+                <td class="w30">Vide grenier</td>
+                <td class="w30">Sainte Hermine</td>
+                <td class="w30">20 km</td>
+            </tr>
+            <tr>
+                <td class="w10">04/05/2017</td>
+                <td class="w30">Loto</td>
+                <td class="w30">Chantonnay</td>
+                <td class="w30">10 km</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block javascripts %}
+  <script>
+  function myFunction() {
+    // Declare variables
+    var input, filter, table, tr, td, i;
+    input = document.getElementById("myInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("myTable");
+    tr = table.getElementsByTagName("tr");
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName("td")[0];
+      if (td) {
+        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+
+      td = tr[i].getElementsByTagName("td")[1];
+      if (td) {
+        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        } else {
+          tr[i].style.display = "none";
+        }
+      }
+    }
+  }
+  </script>
+{% endblock %}

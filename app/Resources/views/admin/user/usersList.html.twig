@@ -1,43 +1,106 @@
 {% extends 'base.html.twig' %}
 
-{% block content %}
-    <div id="main">
-        <div id="kube-component" class="content">
-            <div class="form-item">
-              <input type="text" id="searchUser" onkeyup="searchUser()" placeholder="Rechercher un utilisateur">
-            </div>
-            <div id="contentDivUser" class="row gutters">
-                {% for user in users %}
-                    <div class="col col-4 user">
-                        <a href="{{ path('userGeneral', {'userSlug': user.username}) }}">{{ user.firstname }} {{ user.lastname }}</a>
-                    </div>
-                {% endfor %}
-            </div>
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Liste des utilisateurs</h2>
+        </header>
+
+        <form method="post">
+            <input type="text" id="searchUser" onkeyup="search()" placeholder="Rechercher un utilisateur">
+        </form>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Prénom</th>
+                        <th onclick="sortTable(1)">Nom</th>
+                        <th>Cinéscénie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>
+                                {% if user['countSchedules'] < 15 %}
+                                    <b>
+                                        <i class="fa fa-exclamation"></i>
+                                    </b>
+                                {% endif %} 
+                                <a href="{{ path('userGeneral', {'userSlug': user[0].username}) }}">{{ user[0].firstname }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ path('userGeneral', {'userSlug': user[0].username}) }}">{{ user[0].lastname }}</a>
+                            </td>
+                            <td>{{ user['countSchedules'] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block javascripts %}
-  <script>
-  function searchUser() {
-    // Declare variables
-    var input, filter, table, divUser, td, i;
-    input = document.getElementById("searchUser");
-    filter = input.value.toUpperCase();
-    contentDivUser = document.getElementById("contentDivUser");
-    divUser = contentDivUser.getElementsByTagName("div");
+    {{ parent() }}
 
-    // Loop through all table rows, and hide those who don't match the search query
-    for (i = 0; i < divUser.length; i++) {
-      a = divUser[i].getElementsByTagName("a")[0];
-      if (a) {
-        if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-          divUser[i].style.display = "";
-        } else {
-          divUser[i].style.display = "none";
+    <script>
+      function search() {
+        // Declare variables
+        var input, filter, table, tr, td, i;
+        input = document.getElementById("searchUser");
+        filter = input.value.toUpperCase();
+        table = document.getElementsByTagName("table");
+        tr = table[0].getElementsByTagName("tr");
+
+        // Loop through all table rows, and hide those who don't match the search query
+        for (i = 0; i < tr.length; i++) {
+          td = tr[i].getElementsByTagName("td")[0];
+          if (td) {
+            if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
         }
       }
-    }
-  }
-  </script>
+
+      function sortTable(column) {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementsByTagName("table")[0];
+        switching = true;
+        /*Make a loop that will continue until
+        no switching has been done:*/
+        while (switching) {
+          //start by saying: no switching is done:
+          switching = false;
+          rows = table.getElementsByTagName("tr");
+          /*Loop through all table rows (except the
+          first, which contains table headers):*/
+          for (i = 1; i < (rows.length - 1); i++) {
+            //start by saying there should be no switching:
+            shouldSwitch = false;
+            /*Get the two elements you want to compare,
+            one from current row and one from the next:*/
+            x = rows[i].getElementsByTagName("td")[column].getElementsByTagName("a")[0];
+            y = rows[i + 1].getElementsByTagName("td")[column].getElementsByTagName("a")[0];
+
+            //check if the two rows should switch place:
+            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+              //if so, mark as a switch and break the loop:
+              shouldSwitch= true;
+              break;
+            }
+          }
+          if (shouldSwitch) {
+            /*If a switch has been marked, make the switch
+            and mark that a switch has been done:*/
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+          }
+        }
+      }
+    </script>
 {% endblock %}

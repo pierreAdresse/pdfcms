@@ -1,0 +1,52 @@
+{% set menu = {'items':
+    [
+        { 'route': 'topicalities', 'label': 'Actualités' },
+        { 'route': 'informations', 'label': 'Informations' },
+        { 'route': 'requestForVisit', 'label': 'Demande de visite' },
+        { 'route': 'usersList', 'label': 'Gestion du groupe', 'submenu': [
+            { 'route': 'usersList', 'label': 'Liste des membres' },
+            { 'route': 'usersSchedule', 'label': 'Planning' },
+            { 'route': 'usersActivityDivision', 'label': 'Répartition des rôles' },
+        ]},
+        { 'route': 'account', 'label': 'Mon compte', 'submenu': [
+            { 'route': 'account', 'label': 'Informations personnelles' },
+            { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter' },
+        ]},
+        { 'route': 'setting', 'label': 'Paramétrage' },
+    ]
+} %}
+
+<nav id="menu">
+    <header class="major">
+        <h2>Menu</h2>
+    </header>
+    <ul>
+        {% for item in menu.items %}
+            {% set isActive = false %}
+            {% if app.request.attributes.get('_route') == item.route %}
+                {% set isActive = true %}
+            {% endif %}
+
+            {% if item.submenu is defined %}
+                <li>
+                    <span class="opener">{{ item.label }}</span>
+                    <ul>
+                        {% for submenuItem in item.submenu %}
+                            {% set isActive = false %}
+                            {% if app.request.attributes.get('_route') == submenuItem.route %}
+                                {% set isActive = true %}
+                            {% endif %}
+                            <li>
+                                <a class="{% if isActive %}active{% endif %}" href="{{ path(submenuItem.route) }}">{{ submenuItem.label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% else %}
+                <li>
+                    <a class="{% if isActive %}active{% endif %}" href="{{ path(item.route) }}">{{ item.label }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</nav>

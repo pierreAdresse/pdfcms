@@ -10,4 +10,20 @@ namespace AppBundle\Repository;
  */
 class CinescenieRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getByUser($user)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT c
+            FROM AppBundle:Cinescenie c
+            JOIN c.schedules s WITH (s.user = :user)
+            '
+        )->setPArameters([
+        	'user' => $user
+        ]);
+        $cinescenies = $query->getResult();
+
+        return $cinescenies;
+    }
 }

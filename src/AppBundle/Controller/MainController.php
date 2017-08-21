@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Repository\CinescenieRepository;
 use AppBundle\Form\UserType;
+use AppBundle\Form\ChoiceSkillType;
+use AppBundle\Form\ChoiceCinescenieType;
 use AppBundle\Entity\UserSkill;
 use AppBundle\Entity\Schedule;
 use AppBundle\Entity\Cinescenie;
@@ -33,11 +35,19 @@ class MainController extends Controller
     }
 
     /**
-     * @Route("/demandes", name="requests")
+     * @Route("/demande-de-visite", name="requestForVisit")
      */
-    public function requestsAction(Request $request)
+    public function requestForVisitAction(Request $request)
     {
-        return $this->render('main/requests.html.twig');
+        return $this->render('main/requestForVisit.html.twig');
+    }
+
+    /**
+     * @Route("/mon-compte", name="account")
+     */
+    public function accountAction(Request $request)
+    {
+        return $this->render('main/account.html.twig');
     }
 
     /**
@@ -88,11 +98,11 @@ class MainController extends Controller
 
         $cinescenies = $query->getResult();
 
-        $cinescenieKey = $request->request->get('select_cinescenie');
+        $cinescenieKey = $request->request->get('select-cinescenie');
         if (!empty($cinescenieKey)) {
             $em = $this->getDoctrine()->getManager();
 
-            $cinescenieElements = explode('_', $cinescenieKey);
+            $cinescenieElements = explode('-', $cinescenieKey);
             $cinescenieId = $cinescenieElements[1];
 
             $cinescenie = $this->getDoctrine()
@@ -271,8 +281,8 @@ class MainController extends Controller
         $schedules = $cinescenie->getSchedules();
 
         $activities = $this->getDoctrine()
-          ->getRepository('AppBundle:Activity')
-          ->findAll()
+            ->getRepository('AppBundle:Activity')
+            ->findAll()
         ;
 
         $schedulesKeys = $request->request->keys();
@@ -289,7 +299,7 @@ class MainController extends Controller
 
             // Ajouter les rôles sur les plannings
             foreach ($schedulesKeys as $schedulesKey) {
-                $scheduleElements = explode('_', $schedulesKey);
+                $scheduleElements = explode('-', $schedulesKey);
                 $scheduleId = $scheduleElements[1];
 
                 $schedule = $this->getDoctrine()
@@ -300,7 +310,7 @@ class MainController extends Controller
                 $activityKey = $request->request->get($schedulesKey);
 
                 if (!empty($activityKey)) {
-                    $activityElements = explode('_', $activityKey);
+                    $activityElements = explode('-', $activityKey);
                     $activityId = $activityElements[1];
 
                     $activity = $this->getDoctrine()
@@ -372,22 +382,22 @@ class MainController extends Controller
      */
     public function usersListAction(Request $request)
     {
+        /*
         $users = $this->getDoctrine()
             ->getRepository('AppBundle:User')
-            ->findAll()
+            ->findBy([], [
+                'firstname' => 'ASC',
+            ])
+        ;
+        */
+        $users = $this->getDoctrine()
+            ->getRepository('AppBundle:User')
+            ->getAndCountSchedules()
         ;
 
         return $this->render('admin/user/usersList.html.twig', [
             'users' => $users,
         ]);
-    }
-
-    /**
-     * @Route("/profil", name="account")
-     */
-    public function accountAction(Request $request)
-    {
-        return $this->render('main/account.html.twig');
     }
 
     /**
@@ -439,30 +449,28 @@ class MainController extends Controller
           ->findAll()
         ;
 
-        $userSkillsKeys = $request->request->keys();
-        if (!empty($userSkillsKeys)) {
+        $defaultSkills = $this->getDoctrine()
+          ->getRepository('AppBundle:Skill')
+          ->getByUser($user)
+        ;
+
+        $form = $this->createForm(ChoiceSkillType::class, $skills, ['defaultSkills' => $defaultSkills]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
             // Supprimer les compétences
-            $userSkills = $this->getDoctrine()
-              ->getRepository('AppBundle:UserSkill')
-              ->findByUser($user)
-            ;
-
+            $userSkills = $user->getUserSkills();
             foreach ($userSkills as $userSkill) {
                 $em->remove($userSkill);
             }
 
             // Ajouter les compétences
-            foreach ($userSkillsKeys as $userSkillsKey) {
-                $skillElements = explode('_', $userSkillsKey);
-                $skillId = $skillElements[1];
-
-                $skill = $this->getDoctrine()
-                  ->getRepository('AppBundle:Skill')
-                  ->find($skillId)
-                ;
-
+            $keys = $request->request->get('choice_skill')['skills'];
+            $skills = $form->getData();
+            foreach ($keys as $key) {
+                $skill = $skills[$key];
                 $userSkill = new UserSkill();
                 $userSkill->setUser($user);
                 $userSkill->setSkill($skill);
@@ -482,6 +490,7 @@ class MainController extends Controller
         return $this->render('admin/user/userEditSkills.html.twig', [
             'skills' => $skills,
             'user'   => $user,
+            'form'   => $form->createView(),
         ]);
     }
 
@@ -500,8 +509,15 @@ class MainController extends Controller
           ->findBy([], ['date' => 'ASC'])
         ;
 
-        $cinesceniesKeys = $request->request->keys();
-        if (!empty($cinesceniesKeys)) {
+        $defaultCinescenies = $this->getDoctrine()
+          ->getRepository('AppBundle:Cinescenie')
+          ->getByUser($user)
+        ;
+
+        $form = $this->createForm(ChoiceCinescenieType::class, $cinescenies, ['defaultCinescenies' => $defaultCinescenies]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
             // Comparer le planning avant et après
@@ -515,16 +531,11 @@ class MainController extends Controller
                 $cinesceniesFromSchedules[$schedule->getCinescenie()->getId()] = $schedule->getCinescenie();
             }
 
+            $keys = $request->request->get('choice_cinescenie')['cinescenies'];
+            $cinescenies = $form->getData();
             $cinesceniesFromForm = [];
-            foreach ($cinesceniesKeys as $cinesceniesKey) {
-                $cinescenieElements = explode('_', $cinesceniesKey);
-                $cinescenieId = $cinescenieElements[1];
-
-                $cinescenie = $this->getDoctrine()
-                  ->getRepository('AppBundle:Cinescenie')
-                  ->find($cinescenieId)
-                ;
-
+            foreach ($keys as $key) {
+                $cinescenie = $cinescenies[$key];
                 $cinesceniesFromForm[$cinescenie->getId()] = $cinescenie;
             }
 
@@ -533,7 +544,10 @@ class MainController extends Controller
             foreach ($cinesceniesToDelete as $cineToDelete) {
                 $schedule = $this->getDoctrine()
                   ->getRepository('AppBundle:Schedule')
-                  ->findOneByCinescenie($cineToDelete)
+                  ->findOneBy([
+                        'cinescenie' => $cineToDelete,
+                        'user'       => $user,
+                    ])
                 ;
 
                 // Empêcher de supprimer un planning quand la cinéscénie est validée
@@ -545,6 +559,11 @@ class MainController extends Controller
             // Planning à ajouter
             $cinesceniesToAdd = array_diff_key($cinesceniesFromForm, $cinesceniesFromSchedules);
             foreach ($cinesceniesToAdd as $cineToAdd) {
+                // Empêcher d'ajouter un planning quand la cinéscénie est validée
+                if ($cineToAdd->getState() == Cinescenie::STATE_VALIDATE) {
+                    continue;
+                }
+
                 $schedule = new Schedule();
                 $schedule->setUser($user);
                 $schedule->setCinescenie($cineToAdd);
@@ -564,6 +583,7 @@ class MainController extends Controller
         return $this->render('admin/user/userEditSchedule.html.twig', [
             'user'        => $user,
             'cinescenies' => $cinescenies,
+            'form'        => $form->createView(),
         ]);
     }
 

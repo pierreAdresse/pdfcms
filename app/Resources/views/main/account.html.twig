@@ -1,38 +1,32 @@
 {% extends 'base.html.twig' %}
 
-{% block submenu %}
-    <nav id="subnav">
-        <ul>
-            <li><b>Informations personelles</b></li>
-            <li><a href="{{ path('fos_user_security_logout') }}">Se déconnecter</a></li>
-        </ul>
-    </nav>
-{% endblock %}
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Informations personnelles</h2>
+        </header>
 
-{% block content %}
-
-    <div id="main">
-        <div id="kube-component" class="content">
-          <table>
-              <tbody>
-                  <tr>
-                      <td>Prénom</td>
-                      <td>{{ app.user.firstname }}</td>
-                  </tr>
-                  <tr>
-                      <td>Nom</td>
-                      <td>{{ app.user.lastname }}</td>
-                  </tr>
-                  <tr>
-                      <td>Email</td>
-                      <td>{{ app.user.email }}</td>
-                  </tr>
-                  <tr>
-                      <td>Téléphone</td>
-                      <td>06 16 23 24 77</td>
-                  </tcd
-              </tbody>
-          </table>
+        <div class="table-wrapper">
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Prénom</td>
+                        <td>{{ app.user.firstname }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nom</td>
+                        <td>{{ app.user.lastname }}</td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>{{ app.user.email }}</td>
+                    </tr>
+                    <tr>
+                        <td>Téléphone</td>
+                        <td>{{ app.user.phone }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
+    </section>
 {% endblock %}

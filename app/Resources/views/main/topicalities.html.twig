@@ -1,48 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{#
-{% block submenu %}
-    <nav id="subnav">
-        <ul>
-            <li><b>Générales</b></li>
-            <li><a href="#">Comptes rendus</a></li>
-    	    <li><a href="#">Menu</a></li>
-        </ul>
-    </nav>
-{% endblock %}
-#}
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Actualités</h2>
+        </header>
 
-{% block content %}
-
-    <div id="main">
-        {#
-        <div id="hero">
-            <h1>.</h1>
-        </div>
-        #}
-
-        <div id="kube-component" class="content">
-            <h3><a href="">Actualité titre 1</a></h3>
-            <p>Typography of Kube based on the 4px horizontal grid, it means that for the headers, paragraphs, quotes and any other texts chosen are a combination of line-height, that fit into the 4px grid and help set the horizontal rhythm of design by default.</p>
-            <p class="text-right smaller">Publié par Pierre Bertaud le 13/07/2017 à 16h34<br/><a href="">Voir les commentaires (3)</a></p>
-
-            <h3>Actualité titre 2</h3>
-            <p>Typography of Kube based on the 4px horizontal grid, it means that for the headers, paragraphs, quotes and any other texts chosen are a combination of line-height, that fit into the 4px grid and help set the horizontal rhythm of design by default.</p>
-            <p></p>
-            <p class="text-right small">Publié par Pierre Bertaud<br/>le 13/07/2017 à 16h34</p>
-
-            <nav class="pagination align-center">
-                <ul>
-                    <li class="prev"><a href="">&larr;</a></li>
-                    <li>
-                        <ul>
-                            <li class="active"><a href="#">1</a></li>
-                            <li><a href="">2</a></li>
-                        </ul>
-                    </li>
-                    <li class="next"><a href="">&rarr;</a></li>
+        <div class="posts">
+            <article>
+                <a href="#" class="image"><img src="images/pic01.jpg" alt="" /></a>
+                <h3>Interdum aenean</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
                 </ul>
-            </nav>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
+            <article>
+                <a href="#" class="image"><img src="images/pic02.jpg" alt="" /></a>
+                <h3>Nulla amet dolore</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
+                </ul>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
+            <article>
+                <a href="#" class="image"><img src="images/pic03.jpg" alt="" /></a>
+                <h3>Tempus ullamcorper</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
+                </ul>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
+            <article>
+                <a href="#" class="image"><img src="images/pic04.jpg" alt="" /></a>
+                <h3>Sed etiam facilis</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
+                </ul>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
+            <article>
+                <a href="#" class="image"><img src="images/pic05.jpg" alt="" /></a>
+                <h3>Feugiat lorem aenean</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
+                </ul>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
+            <article>
+                <a href="#" class="image"><img src="images/pic06.jpg" alt="" /></a>
+                <h3>Amet varius aliquam</h3>
+                <p>Aenean ornare velit lacus, ac varius enim lorem ullamcorper dolore. Proin aliquam facilisis ante interdum. Sed nulla amet lorem feugiat tempus aliquam.</p>
+                <ul class="actions">
+                    <li><a href="#" class="button">En savoir plus</a></li>
+                </ul>
+                <p class="align-right"><i>Le 17/08/2017 à 9h47 par <a href="#">Pierre B.</a></i></p>
+            </article>
         </div>
+    </section>
+
+    <div class="align-center">
+        <ul class="pagination">
+            <li><span class="button disabled">Précédent</span></li>
+            <li><a href="#" class="page active">1</a></li>
+            <li><a href="#" class="page">2</a></li>
+            <li><a href="#" class="page">3</a></li>
+            <li><span>&hellip;</span></li>
+            <li><a href="#" class="page">8</a></li>
+            <li><a href="#" class="page">9</a></li>
+            <li><a href="#" class="page">10</a></li>
+            <li><a href="#" class="button">Suivant</a></li>
+        </ul>
     </div>
 {% endblock %}

@@ -49,8 +49,14 @@ class Cinescenie
      */
     private $schedules;
 
+    /**
+     * @ORM\OneToMany(targetEntity="CinescenieState", mappedBy="cinescenie")
+     */
+    private $cinescenieStates;
+
     public function __construct() {
-        $this->schedules = new ArrayCollection();
+        $this->schedules        = new ArrayCollection();
+        $this->cinescenieStates = new ArrayCollection();
     }
 
 
@@ -144,5 +150,39 @@ class Cinescenie
     public function getSchedules()
     {
         return $this->schedules;
+    }
+
+    /**
+     * Add cinescenieState
+     *
+     * @param \AppBundle\Entity\CinescenieState $cinescenieState
+     *
+     * @return Cinescenie
+     */
+    public function addCinescenieState(\AppBundle\Entity\CinescenieState $cinescenieState)
+    {
+        $this->cinescenieStates[] = $cinescenieState;
+
+        return $this;
+    }
+
+    /**
+     * Remove cinescenieState
+     *
+     * @param \AppBundle\Entity\CinescenieState $cinescenieState
+     */
+    public function removeCinescenieState(\AppBundle\Entity\CinescenieState $cinescenieState)
+    {
+        $this->cinescenieStates->removeElement($cinescenieState);
+    }
+
+    /**
+     * Get cinescenieStates
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCinescenieStates()
+    {
+        return $this->cinescenieStates;
     }
 }

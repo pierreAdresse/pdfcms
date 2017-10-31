@@ -35,6 +35,18 @@
                                 <td>Téléphone</td>
                                 <td>{{ user.phone }}</td>
                             </tr>
+                            <tr>
+                                <td>Village</td>
+                                <td>{{ user.hut.town.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Groupe</td>
+                                <td>{{ user.hut.name }}</td>
+                            </tr>
+                            <tr>
+                                <td>Actif</td>
+                                <td>{% if user.enabled == 1 %}Oui{% else %}Non{% endif %}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -45,7 +57,7 @@
                     <div class="7u 12u$(medium)">
                         <p>
                             <a class="button fit" href="{{ path('userEditAccount', {'userSlug': user.username}) }}">
-                                Modifier les informations
+                                Modifier le mot de passe
                             </a>
                         </p>
                     </div>
@@ -148,7 +160,7 @@
 {% extends 'base.html.twig' %}
 
 {% block submenu %}
-    {% include 'admin/user/usersSubmenu.html.twig' %}
+    {% include 'admin/user/submenu.html.twig' %}
 {% endblock %}
 
 {% set months = [

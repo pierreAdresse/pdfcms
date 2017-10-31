@@ -42,7 +42,7 @@
                                 {% if cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_VALIDATE') %}
                                     <i class="fa fa-check fa-2x"></i>
                                 {% elseif cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_DRAFT') %}
-                                    <a href="{{ path('usersScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
+                                    <a href="{{ path('userScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
                                 {% endif %}
                             </td>
                         </tr>
@@ -76,7 +76,7 @@
                                 {% if cinescenie.state == constant('AppBundle\\Entity\\Cinescenie::STATE_VALIDATE') %}
                                     <i class="fa fa-check fa-2x"></i>
                                 {% else %}
-                                    <a href="{{ path('usersScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
+                                    <a href="{{ path('userScheduleEditActivities', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-pencil fa-2x"></i></a>
                                 {% endif %}
                             </td>
                         </tr>

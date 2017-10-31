@@ -73,6 +73,12 @@ class Activity
      */
     private $skillActivities;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="activities")
+     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     */
+    private $hut;
+
     public function __construct() {
         $this->shedules        = new ArrayCollection();
         $this->skillActivities = new ArrayCollection();
@@ -203,5 +209,29 @@ class Activity
     public function getSchedules()
     {
         return $this->schedules;
+    }
+
+    /**
+     * Set hut
+     *
+     * @param \AppBundle\Entity\Hut $hut
+     *
+     * @return Activity
+     */
+    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    {
+        $this->hut = $hut;
+
+        return $this;
+    }
+
+    /**
+     * Get hut
+     *
+     * @return \AppBundle\Entity\Hut
+     */
+    public function getHut()
+    {
+        return $this->hut;
     }
 }

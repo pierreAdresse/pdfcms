@@ -3,16 +3,45 @@
         { 'route': 'topicalities', 'label': 'Actualités' },
         { 'route': 'informations', 'label': 'Informations' },
         { 'route': 'requestForVisit', 'label': 'Demande de visite' },
-        { 'route': 'usersList', 'label': 'Gestion du groupe', 'submenu': [
-            { 'route': 'usersList', 'label': 'Liste des membres' },
-            { 'route': 'usersSchedule', 'label': 'Planning' },
-            { 'route': 'usersActivityDivision', 'label': 'Répartition des rôles' },
+        { 'route': 'userList', 'label': 'Gestion du groupe', 'submenu': [
+            { 'route': 'userList', 'label': 'Tableau de bord' },
+            { 'route': 'userList', 'label': 'Liste des membres' },
+            { 'route': 'userSchedule', 'label': 'Planning' },
+            { 'route': 'userActivityDivision', 'label': 'Répartition des rôles' },
+            { 'route': 'userList', 'label': 'Actualités' },
+            { 'route': 'userList', 'label': 'Informations' },
+            { 'route': 'userList', 'label': 'Visites' },
         ]},
-        { 'route': 'account', 'label': 'Mon compte', 'submenu': [
-            { 'route': 'account', 'label': 'Informations personnelles' },
+        { 'route': 'userList', 'label': 'Gestion du village', 'submenu': [
+            { 'route': 'userList', 'label': 'Liste des membres' },
+            { 'route': 'userList', 'label': 'Groupes' },
+            { 'route': 'userList', 'label': 'Actualités' },
+            { 'route': 'userList', 'label': 'Informations' },
+            { 'route': 'userList', 'label': 'Visites' },
+        ]},
+        { 'route': 'userList', 'label': 'Gestion de la Cinéscénie', 'submenu': [
+            { 'route': 'userList', 'label': 'Liste des membres' },
+            { 'route': 'userList', 'label': 'Villages' },
+            { 'route': 'userList', 'label': 'Actualités' },
+            { 'route': 'userList', 'label': 'Informations' },
+            { 'route': 'userList', 'label': 'Visites' },
+        ]},
+        { 'route': 'setting', 'label': 'Paramétrage', 'submenu': [
+            { 'route': 'userList', 'label': 'Général' },
+            { 'route': 'userList', 'label': 'Cinéscénies' },
+            { 'route': 'userList', 'label': 'Utilisateurs' },
+            { 'route': 'userList', 'label': 'Autorisations' },
+            { 'route': 'userList', 'label': 'Catégorie de rôles' },
+            { 'route': 'userList', 'label': 'Rôles' },
+            { 'route': 'userList', 'label': 'Compétences' },
+            { 'route': 'userList', 'label': 'Rôles par compétence' },
+        ]},
+        { 'route': 'myAccount', 'label': 'Mon compte', 'submenu': [
+            { 'route': 'myAccount', 'label': 'Informations personnelles' },
+            { 'route': 'myAccount', 'label': 'Changer son mot de passe' },
+            { 'route': 'myAccount', 'label': 'Planning' },
             { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter' },
         ]},
-        { 'route': 'setting', 'label': 'Paramétrage' },
     ]
 } %}
 

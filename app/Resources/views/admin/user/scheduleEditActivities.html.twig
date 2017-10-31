@@ -38,7 +38,7 @@
             <div class="row uniform">
                 <div class="12u$">
                     <ul class="actions align-right">
-                        <li><a href="{{ path('usersSchedule') }}" class="button">Retour</a></li>
+                        <li><a href="{{ path('userSchedule') }}" class="button">Retour</a></li>
                         <li><input type="submit" value="{% if cinescenie.date|date('ymd') < 'now'|date('ymd') %}Enregistrer et valider{% else %}Enregistrer{% endif %}" class="special" /></li>
                     </ul>
                 </div>

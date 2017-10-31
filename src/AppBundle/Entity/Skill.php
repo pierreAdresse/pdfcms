@@ -51,10 +51,17 @@ class Skill
      */
     private $skillActivities;
 
+
     /**
      * @ORM\OneToMany(targetEntity="UserSkill", mappedBy="skill")
      */
     private $userSkills;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="skills")
+     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     */
+    private $hut;
 
     public function __construct() {
         $this->skillActivities = new ArrayCollection();
@@ -161,5 +168,29 @@ class Skill
     public function getUserSkills()
     {
         return $this->userSkills;
+    }
+
+    /**
+     * Set hut
+     *
+     * @param \AppBundle\Entity\Hut $hut
+     *
+     * @return Skill
+     */
+    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    {
+        $this->hut = $hut;
+
+        return $this;
+    }
+
+    /**
+     * Get hut
+     *
+     * @return \AppBundle\Entity\Hut
+     */
+    public function getHut()
+    {
+        return $this->hut;
     }
 }

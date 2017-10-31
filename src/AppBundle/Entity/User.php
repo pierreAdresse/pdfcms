@@ -56,10 +56,22 @@ class User extends BaseUser
      */
     private $userSkills;
 
+    /**
+     * @ORM\OneToMany(targetEntity="UserAuthorization", mappedBy="user")
+     */
+    private $userAuthorizations;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="users")
+     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     */
+    private $hut;
+
     public function __construct() {
         parent::__construct();
-        $this->shedules   = new ArrayCollection();
-        $this->userSkills = new ArrayCollection();
+        $this->shedules           = new ArrayCollection();
+        $this->userSkills         = new ArrayCollection();
+        $this->userAuthorizations = new ArrayCollection();
     }
 
 
@@ -201,5 +213,63 @@ class User extends BaseUser
     public function getPhone()
     {
         return $this->phone;
+    }
+
+    /**
+     * Set hut
+     *
+     * @param \AppBundle\Entity\Hut $hut
+     *
+     * @return User
+     */
+    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    {
+        $this->hut = $hut;
+
+        return $this;
+    }
+
+    /**
+     * Get hut
+     *
+     * @return \AppBundle\Entity\Hut
+     */
+    public function getHut()
+    {
+        return $this->hut;
+    }
+
+    /**
+     * Add userAuthorization
+     *
+     * @param \AppBundle\Entity\UserAuthorization $userAuthorization
+     *
+     * @return User
+     */
+    public function addUserAuthorization(\AppBundle\Entity\UserAuthorization $userAuthorization)
+    {
+        $this->userAuthorizations[] = $userAuthorization;
+
+        return $this;
+    }
+
+    /**
+     * Remove userAuthorization
+     *
+     * @param \AppBundle\Entity\UserAuthorization $userAuthorization
+     */
+    public function removeUserAuthorization(\AppBundle\Entity\UserAuthorization $userAuthorization)
+    {
+        $this->userAuthorizations->removeElement($userAuthorization);
+    }
+
+    /**
+     * Get userAuthorizations
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUserAuthorizations()
+    {
+        return $this->userAuthorizations;
     }
 }

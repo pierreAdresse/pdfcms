@@ -10,7 +10,7 @@ namespace AppBundle\Repository;
  */
 class CinescenieRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getByUser($user)
+    public function getByUserAndDateGreaterThan($user, $date)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
@@ -18,9 +18,49 @@ class CinescenieRepository extends \Doctrine\ORM\EntityRepository
             SELECT c
             FROM AppBundle:Cinescenie c
             JOIN c.schedules s WITH (s.user = :user)
+            WHERE c.date > :date
+            ORDER BY c.date ASC
             '
-        )->setPArameters([
-        	'user' => $user
+        )->setParameters([
+        	'user' => $user,
+            'date' => $date,
+        ]);
+        $cinescenies = $query->getResult();
+
+        return $cinescenies;
+    }
+
+    public function getByDateGreaterThan($date)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT c
+            FROM AppBundle:Cinescenie c
+            WHERE c.date >= :date
+            ORDER BY c.date ASC
+            '
+        )->setParameters([
+            'date' => $date,
+        ]);
+        $cinescenies = $query->getResult();
+
+        return $cinescenies;
+    }
+
+    public function getCinesceniesBetween($from, $to)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT c
+            FROM AppBundle:Cinescenie c
+            WHERE c.date > :from AND c.date < :to
+            ORDER BY c.date ASC
+            '
+        )->setParameters([
+            'from' => $from,
+            'to'   => $to,
         ]);
         $cinescenies = $query->getResult();
 

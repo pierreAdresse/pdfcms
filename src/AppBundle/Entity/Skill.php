@@ -15,18 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Skill
 {
-    const TELEPILOTE           = 1;
-    const REGISSEUR            = 2;
-    const GCS                  = 3;
-    const ECLAIRAGISTE         = 4;
-    const RESPONSABLE_NEOPTER  = 5;
-    const OPERATEUR_NEOPTER    = 6;
-    const RESPONSABLE_SECURITE = 7;
-    const OPERATEUR_SECURITE   = 8;
-    const VISUEL_REGIE         = 9;
-    const VISUEL               = 10;
-    const SUPPLEANT            = 11;
-
     use TimestampableEntity;
     use BlameableEntity;
 
@@ -58,14 +46,14 @@ class Skill
     private $userSkills;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="skills")
-     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     * @ORM\OneToMany(targetEntity="User", mappedBy="mainSkill")
      */
-    private $hut;
+    private $users;
 
     public function __construct() {
         $this->skillActivities = new ArrayCollection();
         $this->userSkills      = new ArrayCollection();
+        $this->users           = new ArrayCollection();
     }
 
     /**
@@ -171,26 +159,36 @@ class Skill
     }
 
     /**
-     * Set hut
+     * Add user
      *
-     * @param \AppBundle\Entity\Hut $hut
+     * @param \AppBundle\Entity\User $user
      *
      * @return Skill
      */
-    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    public function addUser(\AppBundle\Entity\User $user)
     {
-        $this->hut = $hut;
+        $this->users[] = $user;
 
         return $this;
     }
 
     /**
-     * Get hut
+     * Remove user
      *
-     * @return \AppBundle\Entity\Hut
+     * @param \AppBundle\Entity\User $user
      */
-    public function getHut()
+    public function removeUser(\AppBundle\Entity\User $user)
     {
-        return $this->hut;
+        $this->users->removeElement($user);
+    }
+
+    /**
+     * Get users
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

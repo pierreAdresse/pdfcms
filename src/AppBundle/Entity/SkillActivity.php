@@ -38,7 +38,6 @@ class SkillActivity
      */
     private $activity;
 
-
     /**
      * Get id
      *

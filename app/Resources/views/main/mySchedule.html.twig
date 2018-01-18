@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Mon planning {{ year }}</h2>
+        </header>
+
+        <p>Pour tout changement de date merci de vous adresser à vos responsables.</p>
+
+        <div class="row uniform">
+            <div class="12u 12u$(xsmall)">
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cinescenie in cinescenies %}
+                                    {% set presence = false %}
+                                    {% for schedule in cinescenie.schedules %}
+                                        {% if schedule.user == user %}{% set presence = true %}{% endif %}
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"{% if presence %} checked{% endif %}>
+                                            <label class="without-margin">{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y')|capitalize }}</label>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+        </header>
+
+        <h3>Planning {{ year }}</h3>
+
+        {{ form_start(form) }}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Rôle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cinescenie in form.cinescenies %}
+                        {% set index = cinescenie.vars.value %}
+                        {% set entity = form.cinescenies.vars.choices[index].data %}
+                        {% set activityName = '' %}
+                        {% for schedule in entity.schedules %}
+                            {% if schedule.user == user and schedule.activity %}{% set activityName = schedule.activity.name %}{% endif %}
+                        {% endfor %}
+                        <tr>
+                            <td>
+                                {{ form_widget(cinescenie) }}
+                                {{ form_label(cinescenie, null, { 'label_attr': {'class': 'without-margin'} }) }}
+                            </td>
+                            <td>
+                                {{ activityName }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="row uniform">
+                <div class="12u$">
+                    <ul class="actions align-right">
+                        <li><a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button">Retour</a></li>
+                        <li><input type="submit" value="Enregistrer" class="special" /></li>
+                    </ul>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

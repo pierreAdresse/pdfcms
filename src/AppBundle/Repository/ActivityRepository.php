@@ -10,4 +10,38 @@ namespace AppBundle\Repository;
  */
 class ActivityRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function getSchedulesForUser($user)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT a.name, COUNT(s) AS numberOfTimes
+            FROM AppBundle:Activity a
+            LEFT JOIN a.schedules s WITH (s.user = :user AND s.activity IS NOT NULL)
+            WHERE a.allowForDivision = 1
+            GROUP BY a.id
+            '
+        )->setParameters([
+            'user' => $user,
+        ]);
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
+
+    public function getSchedulesForUsers()
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT s.user, s.activity, COUNT(s.activity) AS numberActivity
+            FROM AppBundle:Schedule s
+            WHERE s.activity IS NOT NULL
+            GROUP BY s.user, s.activity
+            '
+        );
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
 }

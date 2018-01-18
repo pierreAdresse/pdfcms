@@ -105,52 +105,75 @@ Supprimer
 ----
 
 Répartition des rôles :
-- La répartition des rôles se fait sur toutes les dates de l'année (cases à cocher).
-- Seules les dates futures apparaissent et seules les dates validées manuellement sont prises en compte dans la répartition. Si des dates passées ne sont pas validées alors un message d'avertissement est affiché pour indiqué à l'utilisateur qu'il vaudrait mieux d'abord faire toutes les validations sans quoi la répartition ne sera pas forcément cohérente avec les Cinéscénies passées.
-- Pour valider une date il faut "enregistrer et valider" un planning passé en faisant bien attention que les données soient exactes. En cas d'erreur il faudra demander à l'administrateur de faire le changement. Les erreurs de validation auront un impact sur la cohérence de la répartition automatique des rôles.
-- Les utilisateurs peuvent avoir une compétence principale. Grâce à cette compétence ils seront positionnés en priorité sur leur rôle pour le minimum requis des Cinéscénies de l'année (soit 15 Cinéscénies). Si pas de compétence principale alors pas de priorité sur un rôle particulier.
-- La répartition des rôles s'effectue en plusieurs étapes :
-    - Première tentative : Utilisateurs présents le jour demandé avec une compétence du rôle recherché. Trier par nombre de fois qu'il a fait ce rôle dans la saison du plus petit au plus grand. Puis trier par le nombre de séance dans la saison. L'utilisateur n'a pas fait la même catégorie de rôle la dernière fois.
-    - Deuxième tentative : Utilisateurs présents le jour demandé avec une compétence du rôle recherché. Trier par nombre de fois qu'il a fait ce rôle dans la saison du plus petit au plus grand. Puis trier par le nombre de séance dans la saison.
-    - Cas d'un rôle qui n'est pas trouvé : Essayer d'en trouver un dans les utilisateurs déjà positionné en faisant un échange. Sinon ne rien mettre et le signaler.
-- S'il manque des personnes ? Dans ce cas un message d'avertissement sera affiché pour les responsables pour le week-end à venir. A eux de régulariser le planning.
-- Ecrasement des plannings prévus manuellement ? Dans le cas ou une répartition est lancé mais qu'il y a déjà des plannings prévus (soit manuellement, soit de façon automatique via une précédente génération de répartition des rôles), alors un message d'avertissement sera affiché juste avant la répartition. De plus un code couleur pourrait indiquer les dates avec des plannings déjà prévus.
+- OK : La répartition des rôles se fait sur toutes les dates de l'année dans le futur (les dates passées par rapport à la date de référence ne sont pas traitées).
+- OK : Seules les dates futures apparaissent.
+- OK : Il n'y a pas de validation de planning à faire. Par contre à charge des utilisateurs de ne pas modifier à tout bout de champ les plannings passés au risque de fausser les répartitions.
+- OK : Les utilisateurs peuvent avoir une compétence principale. Grâce à cette compétence ils seront positionnés en priorité sur leur rôle pour le minimum requis des Cinéscénies de l'année (soit 15 Cinéscénies). Si pas de compétence principale alors pas de priorité sur un rôle particulier.
+- OK : La répartition des rôles s'effectue en plusieurs étapes :
+    // Choix d'un rôle
+    // T1 - Tentative 1
+        /*
+        Utilisateur avec la compétence demandée
+        Utilisateur avec comme compétence principale la compétence demandée et le quota non atteint
+        Utilisateur dont le dernier rôle fait n'est pas celui demandé
+        */
+    // T2 - Tentative 2
+        /*
+        Utilisateur avec la compétence demandée
+        Utilisateur avec comme compétence principale la compétence demandée et le quota non atteint
+        */
+    // T3 - Tentative 3
+        /*
+        Utilisateur avec la compétence demandée
+        Utilisateur dont le dernier rôle fait n'est pas celui demandé
+        */
+    // T4 - Tentative 4
+        /*
+        Utilisateur avec la compétence demandée
+        */
+    // Priotité dans le choix
+        /*
+        Nombre de fois que le rôle à été fait (le plus petit en priorité)
+        /!\ Nombre de présence dans l'année (le plus petit en priorité) /!\ Pas effectué car techniquement difficile, la personne devrait être là plus souvent
+        */
+    // Cas d'un rôle qui n'est pas trouvé : A charge des utilisateurs de trouver une solution. Un indicateur permet de savoir qu'elles sont les Cinéscénies où tous les rôles sont trouvés ou non.
 
 ----
 
 Tableau de bord :
-- Affichage de tous les avertissements pour son groupe comme les utilisateurs qui ont moins de 15 séances dans la saison, les Cinéscénies avec des rôles sans personne (car manque de compétences), les Cinéscénies avec trop peu de personnes pour assurer tous les rôles, ...
+- Affichage de tous les avertissements comme les utilisateurs qui ont moins de 15 séances dans la saison, les Cinéscénies avec des rôles sans personne, ...
 
 ----
 
 Edition des rôles sur un planning :
-- Au lieu de proposer la liste des utilisateurs puis de devoir choisir un rôle pour chacun alors il serait intéressant de proposer la liste des rôles avec une select box des personnes ayant les compétences adéquates.
-- Dans ce cas par simplicité il faudrait faire juste un formulaire par rôle, de cette façon il est facile de savoir quel utilisateur est encore disponible, etc ...
-- Mais que se passe t'il si personne n'a les compétences ou si nous voulons forcer quelqu'un d'autre n'ayent pas les compétences sur un rôle ? Prévoir une autre select box avec tous les autres choix de personnes possibles et disponibles dont "laissez passer" et "suppléant" (peut-être le cacher puis le faire apparaître par clique sur un bouton). Si le premier est vide alors le deuxième est pris en compte.
+- OK : Au lieu de proposer la liste des utilisateurs puis de devoir choisir un rôle pour chacun alors il serait intéressant de proposer la liste des rôles avec une select box des personnes ayant les compétences adéquates.
+- OK : Dans ce cas par simplicité il faudrait faire juste un formulaire par rôle, de cette façon il est facile de savoir quel utilisateur est encore disponible, etc ...
+- OK : Mais que se passe t'il si personne n'a les compétences ou si nous voulons forcer quelqu'un d'autre n'ayent pas les compétences sur un rôle ? La solution est d'affecter la compétence demandée temporairement pour mettre la personne puis lui enlever une fois le planning fait.
+- OK : Prévoir un choix laissez passer dans la liste des personnes disponibles.
+- OK : Afficher la liste des personnes qui ne sont pas affectées sur un rôle.
 
 ----
 
 Utilisateurs :
-- Pour changer ses informations personnelles :
-    - Pour l'instant les données personnelles des utilisateurs sont mises à jour par l'administrateur de l'application via les informations founie par le secrétariat du PDF. Pour faire le moindre changement l'utilisateur devra en faire la demande auprès du secrétariat. Du point de vue des utilisateurs (membres ou responsables), les informations personnelles sont en lecture seule.
-    - Toutes les informations personnelles dans un premier temps ne seront pas modifiables par les reponsables car ce sera la charge du secrétariat.
-    - Par contre les reponsables pourront toujours faire un changement de mot de passe.
-- Pour changer son mot de passe :
-    - Soit l'utilisateur le fait lui même et dans ce cas il peut le faire via un formulaire dans ses informations personnelles.
-    - Soit le responsable du groupe le fait via un formulaire isolé dédié à ça.
-    Pour garantir la sécurité de l'application il n'y aura pas d'autres moyens pour le moment de changer le mot de passe (pas de lien mot de passe oublié avec envoi par email).
-    - A la premiere connexion proposer à l'utilisateur de changer son mot de passe.
-- Les autorisations et les rôles seront aussi paramétrés par l'administrateur pour éviter de faire n'importe quoi.
-- Afficher un message d'avertissement sur le profil d'un utilisateur s'il ne fait pas ses 15 séances dans la saison.
-- Statistiques sur le nombre de fois joué tel ou tel rôle dans la saison.
+- OK : Pour l'instant les données personnelles des utilisateurs sont mises à jour par l'administrateur de l'application, elles sont en lecture seule.
+- OK : Les autorisations et les rôles seront aussi paramétrées par l'administrateur.
+- OK : Afficher un message d'avertissement sur le profil d'un utilisateur s'il ne fait pas ses 15 séances dans la saison.
+- OK : Statistiques sur le nombre de fois joué tel ou tel rôle dans la saison.
 
 ----
 
 Questions :
-- Que se passe t-il si le planning d'un utilisateur est modifié, qu'une date est enlevée par exemple et qu'il était prévu pour jouer un rôle à cette date ? Il possible de modifier le planning d'un utilisateur que sur les dates futures ou alors sur les dates passées mais avec la condition que l'utilisateur ne jouait aucun rôle à cette date. Dans le cas d'un changement dans le futur et que l'utilisateur devait jouer un rôle alors les messages d'avertissements indiqueront aux responsables que quelque chose ne va pas pour telle ou telle date.
-- Que faire des anciennes données ? (Cinéscénies passées, utilisateurs plus présents, etc ...) La solution serait de tout garder mais de masquer ce qui est passé comme les Cinéscénies et d'avoir un statut spécial pour les utilisateurs plus présents (ou simplement utiliser le fait qu'un utilisateur soit actif ou non).
+- OK : Que se passe t-il si le planning d'un utilisateur est modifié, qu'une date est enlevée par exemple et qu'il était prévu pour jouer un rôle à cette date ? Il n'y a pas de restrictions pour ce genre de modification mais c'est à la responsabilité de l'utilisateur si la répartition est ensuite faussée.
+- OK : Que faire des anciennes données ? (Cinéscénies passées, utilisateurs plus présents, etc ...) La solution serait de tout garder mais de masquer ce qui est passé comme les Cinéscénies et d'avoir un statut spécial pour les utilisateurs plus présents (ou simplement utiliser le fait qu'un utilisateur soit actif ou non). Et donc aussi ne prendre en compte que les Cinéscénies de l'année en cours pour les futurs répartitions de plannings.
+- OK : permettre la suppression fonctionnelle d'un utilisateur (désactivation métier) afin qu'il ne soit plus pris en compte dans les requêtes et plus visibles sur les écrans.
 
 ----
 
 Général :
-- Afficher et prendre en compte les dates des Cinéscénies de la saison en cours, dès le mois d'octobre de l'année en cours alors afficher et prendre en compte les dates des Cinéscénies de la saison suivante. Exemple : mois entre 1 et 9 alors 2017 (année en cours), mois entre 10 et 12 alors 2018 (année en cours +1).
+- OK : Afficher et prendre en compte les dates des Cinéscénies de la saison en cours, dès le mois d'octobre de l'année en cours alors afficher et prendre en compte les dates des Cinéscénies de la saison suivante. Exemple : mois entre 1 et 9 alors 2017 (année en cours), mois entre 10 et 12 alors 2018 (année en cours +1).
+
+----
+
+- OK : Contrôler que sur plusieurs répartition en même temps alors ça prend bien en compte les répartitions précédentes (à la deuxième prend en compte la première par exemple).
+
+----

@@ -3,7 +3,7 @@
 {% block sections %}
     <section>
         <header class="main">
-            <h2>Liste des utilisateurs</h2>
+            <h2>Liste des membres du groupe Neopter</h2>
         </header>
 
         <form method="post">
@@ -23,7 +23,7 @@
                     {% for user in users %}
                         <tr>
                             <td>
-                                {% if user['countSchedules'] < 15 %}
+                                {% if user['countCinescenies'] < 15 %}
                                     <b>
                                         <i class="fa fa-exclamation"></i>
                                     </b>
@@ -33,7 +33,7 @@
                             <td>
                                 <a href="{{ path('userGeneral', {'userSlug': user[0].username}) }}">{{ user[0].lastname }}</a>
                             </td>
-                            <td>{{ user['countSchedules'] }}</td>
+                            <td>{{ user['countCinescenies'] }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

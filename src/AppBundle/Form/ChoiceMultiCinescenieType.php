@@ -7,14 +7,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use AppBundle\Entity\Skill;
 
-class ChoiceCinescenieType extends AbstractType
+class ChoiceMultiCinescenieType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $cinescenies = $options['data'];
 
         $builder
-            ->add('cinescenie', ChoiceType::class, [
+            ->add('cinescenies', ChoiceType::class, [
                 'choices' => $cinescenies,
                 'choice_label' => function($cinescenie, $key, $index) {
                     $formatter = new \IntlDateFormatter(
@@ -27,7 +27,17 @@ class ChoiceCinescenieType extends AbstractType
 
                     return ucfirst($formatter->format($cinescenie->getDate()));
                 },
+                'expanded' => true,
+                'multiple' => true,
+                'data' => $options['defaultCinescenies'],
             ]
         );
+    }
+
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'defaultCinescenies' => '',
+        ]);
     }
 }

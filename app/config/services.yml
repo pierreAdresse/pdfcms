@@ -4,7 +4,34 @@ parameters:
     #parameter_name: value
 
 services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    AppBundle\:
+        resource: '../../src/AppBundle/*'
+        exclude: '../../src/AppBundle/{Entity,Repository}'
+
+    AppBundle\Controller\:
+        resource: '../../src/AppBundle/Controller'
+        tags: ['controller.service_arguments']
+
     twig.extension.intl:
         class: Twig_Extensions_Extension_Intl
         tags:
             - { name: twig.extension }
+
+#
+#    service.date:
+#        class:     AppBundle\Service\Date
+#        autowire:  true
+#        public:   true
+#    service.cinescenie:
+#        class:     AppBundle\Service\Cinescenie
+#        autowire:  true
+#        public: true
+#    service.user:
+#        class:     AppBundle\Service\User
+#        autowire:  true
+#        public: true

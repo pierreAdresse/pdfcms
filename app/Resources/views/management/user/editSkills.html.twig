@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+        </header>
+
+
+        {{ form_start(form) }}
+            <div class="row uniform">
+                <div class="12u$">
+                    <h3>Compétence principale</h3>
+                    <div class="select-wrapper">
+                        {{ form_widget(form.mainSkill) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row uniform">
+                <div class="12u$">
+                    <h3>Compétences</h3>
+
+                    <table>
+                        <tbody>
+                            {% for skill in form.skills %}
+                                <tr>
+                                    <td >
+                                        {{ form_widget(skill) }}
+                                        {{ form_label(skill, null, { 'label_attr': {'class': 'without-margin'} }) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row uniform">
+                <div class="12u$">
+                    <ul class="actions align-right">
+                        <li><a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button">Retour</a></li>
+                        <li><input type="submit" value="Enregistrer" class="special" /></li>
+                    </ul>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

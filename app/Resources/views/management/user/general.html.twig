@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+        </header>
+
+        {% for flash_message in app.session.flashBag.get('notice') %}
+          <div class="box">
+              <p>{{ flash_message }}</p>
+          </div>
+        {% endfor %}
+
+        <div class="row uniform">
+            <div class="6u 12u$(xsmall)">
+                <h3>Informations personnelles</h3>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Prénom</td>
+                                <td>{{ user.firstname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nom</td>
+                                <td>{{ user.lastname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ user.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Téléphone</td>
+                                <td>{{ user.phone }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {#
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('userEditPassword', {'userSlug': user.username}) }}">
+                                Modifier le mot de passe
+                            </a>
+                        </p>
+                    </div>
+                </div>
+                #}
+
+                <hr>
+
+                <h3>Compétence principale</h3>
+                <p>{% if user.mainSkill is not null %}{{ user.mainSkill.name }}{% else %}Aucune{% endif %}</p>
+
+                <hr>
+
+                <h3>Compétences</h3>
+
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <tbody>
+                                {% for skill in skills %}
+                                  <tr>
+                                      <td>
+                                        {% set hasSkill = false %}
+                                        {% for userSkill in user.userSkills %}
+                                            {% if skill == userSkill.skill %}{% set hasSkill = true %}{% endif %}
+                                        {% endfor %}
+                                        <input type="checkbox"{% if hasSkill %} checked{% endif %}>
+                                        <label class="without-margin">{{ skill.name }}</label>
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('userEditSkills', {'userSlug': user.username}) }}">
+                                Modifier les compétences
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h3>Statistiques</h3>
+
+                <p>Nombre total de présences dans la saison : {{ user.schedules|length }}</p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tbody>
+                        	{% for stat in stats %}
+	                            <tr>
+	                                <td>{{ stat.name }}</td>
+	                                <td>{{ stat.numberOfTimes }}</td>
+	                            </tr>
+							{% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div class="6u 12u$(xsmall)">
+                <h3>Planning {{ year }}</h3>
+
+                {% if user.schedules|length < 15 %}
+		            <div class="box">
+		                <p>
+		                	<i class="fa fa-exclamation"></i> Attention : {{ user.firstname }} ne respecte pas les 15 séances (actuellement {{ user.schedules|length }}) minimum de présence.
+		                </p>
+		            </div>
+		        {% endif %}
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Rôle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cinescenie in cinescenies %}
+                                    {% set activityName = '' %}
+                                    {% set presence = false %}
+                                    {% for schedule in cinescenie.schedules %}
+                                        {% if schedule.user == user and schedule.activity %}{% set activityName = schedule.activity.name %}{% endif %}
+                                        {% if schedule.user == user %}{% set presence = true %}{% endif %}
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"{% if presence %} checked{% endif %}>
+                                            <label class="without-margin">{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y')|capitalize }}</label>
+                                        </td>
+                                        <td>
+                                            {% if activityName %}
+                                                {{ activityName }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('userEditSchedule', {'userSlug': user.username}) }}">
+                                Modifier le planning
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

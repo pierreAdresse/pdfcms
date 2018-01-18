@@ -14,6 +14,16 @@ class ChoiceSkillType extends AbstractType
         $skills = $options['data'];
 
         $builder
+            ->add('mainSkill', ChoiceType::class, [
+                'choices' => $skills,
+                'choice_label' => function($skill, $key, $index) {
+                    return $skill->getName();
+                },
+                'data' => $options['mainSkill'],
+                'empty_data'  => null,
+                'required' => false,
+                'placeholder' => 'Aucune',
+            ])
             ->add('skills', ChoiceType::class, [
                 'choices' => $skills,
                 'choice_label' => function($skill, $key, $index) {
@@ -30,6 +40,7 @@ class ChoiceSkillType extends AbstractType
     {
         $resolver->setDefaults([
             'defaultSkills' => '',
+            'mainSkill' => null,
         ]);
     }
 }

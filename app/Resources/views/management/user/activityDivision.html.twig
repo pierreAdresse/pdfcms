@@ -4,26 +4,24 @@
     <section>
         <h3>Répartition des rôles</h3>
 
-        <form method="post">
+        <p>Veuillez choisir la date de Cinéscéni à partir de laquelle la répartition des rôles va commencer</p>
+
+        {{ form_start(form) }}
             <div class="row uniform">
                 <div class="12u$">
-                    <p>Veuillez choisir la date de la Cinéscénie</p>
-
                     <div class="select-wrapper">
-                        <select name="select-cinescenie">
-                            {% for cinescenie in cinescenies %}
-                                <option value="cinescenie-{{ cinescenie.id }}">{{ cinescenie.date|date('d/m/y') }}</option>
-                            {% endfor %}
-                        </select>
+                        {{ form_widget(form.cinescenie) }}
                     </div>
                 </div>
+            </div>
 
+            <div class="row uniform">
                 <div class="12u$">
                     <ul class="actions align-right">
                         <li><input type="submit" value="Lancer la répartition des rôles" class="special" /></li>
                     </ul>
                 </div>
             </div>
-        </form>
+        {{ form_end(form) }}
     </section>
 {% endblock %}

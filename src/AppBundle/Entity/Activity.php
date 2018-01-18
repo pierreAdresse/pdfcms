@@ -15,28 +15,9 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Activity
 {
-    const TELEPILOTE           = 1;
-    const ECLAIRAGISTE         = 2;
-    const REGISSEUR            = 3;
-    const GCS_1                = 4;
-    const GCS_2                = 5;
-    const NEOPTER_1            = 6;
-    const NEOPTER_2            = 7;
-    const NEOPTER_3            = 8;
-    const NEOPTER_4            = 9;
-    const NEOPTER_5            = 10;
-    const SECURITE_1           = 11;
-    const SECURITE_2           = 12;
-    const SECURITE_3           = 13;
-    const SECURITE_4           = 14;
-    const SECURITE_5           = 15;
-    const VISUEL_1             = 16;
-    const VISUEL_2             = 17;
-    const VISUEL_3             = 18;
-    const VISUEL_4             = 19;
-    const VISUEL_5             = 20;
-    const SUPPLEANT            = 21;
-    const SUPPLEANT_CINESCENIE = 22;
+    const SUPPLEANT           = 21;
+    const SUPPLEANT_SPECTACLE = 22;
+    const LAISSEZ_PASSER      = 23;
 
     use TimestampableEntity;
     use BlameableEntity;
@@ -74,16 +55,23 @@ class Activity
     private $skillActivities;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="activities")
-     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     * @var int
+     *
+     * @ORM\Column(name="ranking", type="integer", unique=false)
      */
-    private $hut;
+    private $ranking;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="allowForDivision", type="boolean")
+     */
+    private $allowForDivision;
 
     public function __construct() {
         $this->shedules        = new ArrayCollection();
         $this->skillActivities = new ArrayCollection();
     }
-
 
     /**
      * Get id
@@ -212,26 +200,50 @@ class Activity
     }
 
     /**
-     * Set hut
+     * Set ranking
      *
-     * @param \AppBundle\Entity\Hut $hut
+     * @param integer $ranking
      *
      * @return Activity
      */
-    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    public function setRanking($ranking)
     {
-        $this->hut = $hut;
+        $this->ranking = $ranking;
 
         return $this;
     }
 
     /**
-     * Get hut
+     * Get ranking
      *
-     * @return \AppBundle\Entity\Hut
+     * @return integer
      */
-    public function getHut()
+    public function getRanking()
     {
-        return $this->hut;
+        return $this->ranking;
+    }
+
+    /**
+     * Set allowForDivision
+     *
+     * @param boolean $allowForDivision
+     *
+     * @return Activity
+     */
+    public function setAllowForDivision($allowForDivision)
+    {
+        $this->allowForDivision = $allowForDivision;
+
+        return $this;
+    }
+
+    /**
+     * Get allowForDivision
+     *
+     * @return boolean
+     */
+    public function getAllowForDivision()
+    {
+        return $this->allowForDivision;
     }
 }

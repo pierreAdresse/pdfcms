@@ -15,6 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class User extends BaseUser
 {
+    const LAISSEZ_PASSER = 46;
+
     use TimestampableEntity;
     use BlameableEntity;
 
@@ -57,21 +59,22 @@ class User extends BaseUser
     private $userSkills;
 
     /**
-     * @ORM\OneToMany(targetEntity="UserAuthorization", mappedBy="user")
+     * @ORM\ManyToOne(targetEntity="Skill", inversedBy="users")
+     * @ORM\JoinColumn(name="skill_id", referencedColumnName="id")
      */
-    private $userAuthorizations;
+    private $mainSkill;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="users")
-     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
+     * @var bool
+     *
+     * @ORM\Column(name="deleted", type="boolean")
      */
-    private $hut;
+    private $deleted;
 
     public function __construct() {
         parent::__construct();
         $this->shedules           = new ArrayCollection();
         $this->userSkills         = new ArrayCollection();
-        $this->userAuthorizations = new ArrayCollection();
     }
 
 
@@ -216,60 +219,50 @@ class User extends BaseUser
     }
 
     /**
-     * Set hut
+     * Set mainSkill
      *
-     * @param \AppBundle\Entity\Hut $hut
+     * @param \AppBundle\Entity\Skill $mainSkill
      *
      * @return User
      */
-    public function setHut(\AppBundle\Entity\Hut $hut = null)
+    public function setMainSkill(\AppBundle\Entity\Skill $mainSkill = null)
     {
-        $this->hut = $hut;
+        $this->mainSkill = $mainSkill;
 
         return $this;
     }
 
     /**
-     * Get hut
+     * Get mainSkill
      *
-     * @return \AppBundle\Entity\Hut
+     * @return \AppBundle\Entity\Skill
      */
-    public function getHut()
+    public function getMainSkill()
     {
-        return $this->hut;
+        return $this->mainSkill;
     }
 
     /**
-     * Add userAuthorization
+     * Set deleted
      *
-     * @param \AppBundle\Entity\UserAuthorization $userAuthorization
+     * @param boolean $deleted
      *
      * @return User
      */
-    public function addUserAuthorization(\AppBundle\Entity\UserAuthorization $userAuthorization)
+    public function setDeleted($deleted)
     {
-        $this->userAuthorizations[] = $userAuthorization;
+        $this->deleted = $deleted;
 
         return $this;
     }
 
     /**
-     * Remove userAuthorization
+     * Get deleted
      *
-     * @param \AppBundle\Entity\UserAuthorization $userAuthorization
+     * @return boolean
      */
-    public function removeUserAuthorization(\AppBundle\Entity\UserAuthorization $userAuthorization)
+    public function getDeleted()
     {
-        $this->userAuthorizations->removeElement($userAuthorization);
-    }
-
-    /**
-     * Get userAuthorizations
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getUserAuthorizations()
-    {
-        return $this->userAuthorizations;
+        return $this->deleted;
     }
 }

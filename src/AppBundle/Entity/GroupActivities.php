@@ -15,15 +15,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class GroupActivities
 {
-    const TELEPILOTE   = 1;
-    const ECLAIRAGISTE = 2;
-    const REGISSEUR    = 3;
-    const GCS          = 4;
-    const NEOPTER      = 5;
-    const SECURITE     = 6;
-    const VISUEL       = 7;
-    const SUPPLEANT    = 8;
-
     use TimestampableEntity;
     use BlameableEntity;
 
@@ -51,7 +42,6 @@ class GroupActivities
     public function __construct() {
         $this->activities = new ArrayCollection();
     }
-
 
     /**
      * Get id

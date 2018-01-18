@@ -1,9 +1,20 @@
 {% set menu = {'items':
     [
-        { 'route': 'topicalities', 'label': 'Actualités' },
-        { 'route': 'informations', 'label': 'Informations' },
-        { 'route': 'requestForVisit', 'label': 'Demande de visite' },
-        { 'route': 'userList', 'label': 'Gestion du groupe', 'submenu': [
+        { 'route': 'userList', 'label': 'Liste des membres', 'role': 'ROLE_ADMIN', 'isActiveFor': ['userGeneral', 'userEditSchedule', 'userEditSkills'] },
+        { 'route': 'userSchedule', 'label': 'Planning', 'role': 'ROLE_ADMIN', 'isActiveFor': ['userScheduleEditActivities', 'userScheduleEditActivity'] },
+        { 'route': 'userActivityDivision', 'label': 'Répartition des rôles', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
+        { 'route': 'userDashboard', 'label': 'Tableau de bord', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
+        { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter', 'role': 'ROLE_USER', 'isActiveFor': [] },
+    ]
+} %}
+
+{#
+{% set menu = {'items':
+    [
+        { 'route': 'topicalities', 'label': 'Actualités', 'role': 'ROLE_USER' },
+        { 'route': 'informations', 'label': 'Informations', 'role': 'ROLE_USER' },
+        { 'route': 'requestForVisit', 'label': 'Demande de visite', 'role': 'ROLE_USER' },
+        { 'route': 'userList', 'label': 'Gestion du groupe', 'role': 'ROLE_RESPONSABLE_GROUPE', 'submenu': [
             { 'route': 'userList', 'label': 'Tableau de bord' },
             { 'route': 'userList', 'label': 'Liste des membres' },
             { 'route': 'userSchedule', 'label': 'Planning' },
@@ -12,21 +23,21 @@
             { 'route': 'userList', 'label': 'Informations' },
             { 'route': 'userList', 'label': 'Visites' },
         ]},
-        { 'route': 'userList', 'label': 'Gestion du village', 'submenu': [
+        { 'route': 'userList', 'label': 'Gestion du village', 'role': 'ROLE_RESPONSABLE_VILLAGE', 'submenu': [
             { 'route': 'userList', 'label': 'Liste des membres' },
             { 'route': 'userList', 'label': 'Groupes' },
             { 'route': 'userList', 'label': 'Actualités' },
             { 'route': 'userList', 'label': 'Informations' },
             { 'route': 'userList', 'label': 'Visites' },
         ]},
-        { 'route': 'userList', 'label': 'Gestion de la Cinéscénie', 'submenu': [
+        { 'route': 'userList', 'label': 'Gestion de la Cinéscénie', 'role': 'ROLE_RESPONSABLE_CINESCENIE', 'submenu': [
             { 'route': 'userList', 'label': 'Liste des membres' },
             { 'route': 'userList', 'label': 'Villages' },
             { 'route': 'userList', 'label': 'Actualités' },
             { 'route': 'userList', 'label': 'Informations' },
             { 'route': 'userList', 'label': 'Visites' },
         ]},
-        { 'route': 'setting', 'label': 'Paramétrage', 'submenu': [
+        { 'route': 'setting', 'label': 'Paramétrage', 'role': 'ROLE_ADMIN', 'submenu': [
             { 'route': 'userList', 'label': 'Général' },
             { 'route': 'userList', 'label': 'Cinéscénies' },
             { 'route': 'userList', 'label': 'Utilisateurs' },
@@ -36,14 +47,15 @@
             { 'route': 'userList', 'label': 'Compétences' },
             { 'route': 'userList', 'label': 'Rôles par compétence' },
         ]},
-        { 'route': 'myAccount', 'label': 'Mon compte', 'submenu': [
+        { 'route': 'myAccount', 'label': 'Mon compte', 'role': 'ROLE_USER', 'submenu': [
             { 'route': 'myAccount', 'label': 'Informations personnelles' },
-            { 'route': 'myAccount', 'label': 'Changer son mot de passe' },
-            { 'route': 'myAccount', 'label': 'Planning' },
+            { 'route': 'mySchedule', 'label': 'Planning' },
+            { 'route': 'editMyPassword', 'label': 'Changer son mot de passe' },
             { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter' },
         ]},
     ]
 } %}
+#}
 
 <nav id="menu">
     <header class="major">
@@ -51,30 +63,32 @@
     </header>
     <ul>
         {% for item in menu.items %}
-            {% set isActive = false %}
-            {% if app.request.attributes.get('_route') == item.route %}
-                {% set isActive = true %}
-            {% endif %}
+            {% if is_granted(item.role) %}
+                {% set isActive = false %}
+                {% if app.request.attributes.get('_route') == item.route or app.request.attributes.get('_route') in item.isActiveFor %}
+                    {% set isActive = true %}
+                {% endif %}
 
-            {% if item.submenu is defined %}
-                <li>
-                    <span class="opener">{{ item.label }}</span>
-                    <ul>
-                        {% for submenuItem in item.submenu %}
-                            {% set isActive = false %}
-                            {% if app.request.attributes.get('_route') == submenuItem.route %}
-                                {% set isActive = true %}
-                            {% endif %}
-                            <li>
-                                <a class="{% if isActive %}active{% endif %}" href="{{ path(submenuItem.route) }}">{{ submenuItem.label }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% else %}
-                <li>
-                    <a class="{% if isActive %}active{% endif %}" href="{{ path(item.route) }}">{{ item.label }}</a>
-                </li>
+                {% if item.submenu is defined %}
+                    <li>
+                        <span class="opener">{{ item.label }}</span>
+                        <ul>
+                            {% for submenuItem in item.submenu %}
+                                {% set isActive = false %}
+                                {% if app.request.attributes.get('_route') == submenuItem.route %}
+                                    {% set isActive = true %}
+                                {% endif %}
+                                <li>
+                                    <a class="{% if isActive %}active{% endif %}" href="{{ path(submenuItem.route) }}">{{ submenuItem.label }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        <a class="{% if isActive %}active{% endif %}" href="{{ path(item.route) }}">{{ item.label }}</a>
+                    </li>
+                {% endif %}
             {% endif %}
         {% endfor %}
     </ul>

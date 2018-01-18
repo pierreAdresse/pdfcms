@@ -45,13 +45,6 @@ class Schedule
     private $activity;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Hut", inversedBy="schedules")
-     * @ORM\JoinColumn(name="hut_id", referencedColumnName="id")
-     */
-    private $hut;
-
-
-    /**
      * Get id
      *
      * @return int
@@ -131,29 +124,5 @@ class Schedule
     public function getActivity()
     {
         return $this->activity;
-    }
-
-    /**
-     * Set hut
-     *
-     * @param \AppBundle\Entity\Hut $hut
-     *
-     * @return Schedule
-     */
-    public function setHut(\AppBundle\Entity\Hut $hut = null)
-    {
-        $this->hut = $hut;
-
-        return $this;
-    }
-
-    /**
-     * Get hut
-     *
-     * @return \AppBundle\Entity\Hut
-     */
-    public function getHut()
-    {
-        return $this->hut;
     }
 }

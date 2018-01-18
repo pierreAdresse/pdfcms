@@ -12,43 +12,135 @@ use AppBundle\Entity\Cinescenie;
  */
 class UserRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getForDivision(Cinescenie $cinescenie, $skillsId)
+    public function getForDivisionT1($pastCinescenies, $skills, $activity, $quota)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT u, COUNT(sc.id) AS totalSchedules
+            SELECT u, COUNT(sc.id) AS activityNumber
             FROM AppBundle:User u
             JOIN u.userSkills us WITH us.skill IN (:skills)
-            JOIN us.skill s
-            JOIN s.skillActivities sa
-            JOIN sa.activity a
-            LEFT JOIN a.schedules sc WITH (sc.user = u)
-            JOIN u.schedules sc2 WITH (sc2.cinescenie = :cinescenie)
+            LEFT JOIN u.schedules sc WITH (sc.activity = :activity AND sc.cinescenie IN (:pastCinescenies))
+            WHERE u.mainSkill IN (:skills)
+            AND u.deleted = 0
             GROUP BY u.id
-            ORDER BY totalSchedules ASC
+            HAVING activityNumber <= :quota
+            ORDER BY activityNumber ASC
             '
         )->setParameters([
-            'skills'     => $skillsId,
-            'cinescenie' => $cinescenie,
+            'skills'          => $skills,
+            'activity'        => $activity,
+            'pastCinescenies' => $pastCinescenies,
+            'quota'           => $quota,
+        ]);
+        $users = $query->getResult();
+
+        return $users; 
+    }
+
+    public function getForDivisionT3($pastCinescenies, $skills, $activity)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT u, COUNT(sc.id) AS activityNumber
+            FROM AppBundle:User u
+            JOIN u.userSkills us WITH us.skill IN (:skills)
+            LEFT JOIN u.schedules sc WITH (sc.activity = :activity AND sc.cinescenie IN (:pastCinescenies))
+            WHERE u.deleted = 0
+            GROUP BY u.id
+            ORDER BY activityNumber ASC
+            '
+        )->setParameters([
+            'skills'          => $skills,
+            'activity'        => $activity,
+            'pastCinescenies' => $pastCinescenies,
+        ]);
+        $users = $query->getResult();
+
+        return $users; 
+    }
+
+    /*
+    public function sortByPresence($users)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT u, COUNT(sc.id) AS presence
+            FROM AppBundle:User u
+            LEFT JOIN u.schedules sc
+            WHERE u.id IN (:users)
+            GROUP BY u.id
+            ORDER BY presence ASC
+            '
+        )->setParameters([
+            'users' => $users,
+        ]);
+        $users = $query->getResult();
+
+        return $users; 
+    }
+    */
+
+    public function getAndCountSchedules($date)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT u, COUNT(c.id) AS countCinescenies
+            FROM AppBundle:User u
+            LEFT JOIN u.schedules sc
+            LEFT JOIN sc.cinescenie c WITH c.date > :date
+            WHERE u.deleted = 0
+            GROUP BY u.id
+            ORDER BY u.firstname ASC
+            '
+        )->setParameters([
+            'date' => $date,
         ]);
         $users = $query->getResult();
 
         return $users;
     }
 
-    public function getAndCountSchedules()
+    public function getForActivityWithSkill($cinescenie, $skill)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT u, COUNT(sc.id) AS countSchedules
+            SELECT u
             FROM AppBundle:User u
-            JOIN u.schedules sc WITH (sc.user = u)
-            GROUP BY u.id
+            JOIN u.schedules sc WITH (sc.cinescenie = :cinescenie and sc.activity is null)
+            JOIN u.userSkills us WITH (us.skill = :skill)
+            WHERE u.deleted = 0
             ORDER BY u.firstname ASC
             '
-        );
+        )->setParameters([
+            'cinescenie' => $cinescenie,
+            'skill'      => $skill,
+        ]);
+        $users = $query->getResult();
+
+        return $users;
+    }
+
+    public function getForActivityWithoutSkill($cinescenie, $users)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT u
+            FROM AppBundle:User u
+            JOIN u.schedules sc WITH (sc.cinescenie = :cinescenie and sc.activity is null)
+            WHERE u NOT IN (:users)
+            AND u.deleted = 0
+            ORDER BY u.firstname ASC
+            '
+        )->setParameters([
+            'cinescenie' => $cinescenie,
+            'users'      => $users,
+        ]);
         $users = $query->getResult();
 
         return $users;

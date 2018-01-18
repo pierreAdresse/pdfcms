@@ -2,7 +2,6 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Entity\Cinescenie;
 use AppBundle\Entity\User;
 
 /**
@@ -13,28 +12,28 @@ use AppBundle\Entity\User;
  */
 class ScheduleRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getLastActivity(User $user)
+    public function getLastActivity(User $user, $from, $to)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
             SELECT s
             FROM AppBundle:Schedule s
-            JOIN s.activity a
-            JOIN s.cinescenie c WITH (c.state = :state)
+            JOIN s.cinescenie c WITH (c.date > :from AND c.date < :to)
             WHERE s.user = :user
             ORDER BY c.date DESC
             '
         )->setParameters([
-            'state' => Cinescenie::STATE_VALIDATE,
-            'user'  => $user
+            'user' => $user,
+            'from' => $from,
+            'to'   => $to,
         ]);
         $schedules = $query->getResult();
 
         return $schedules;
     }
 
-    public function getWithoutActivity(Cinescenie $cinescenie)
+    public function getWithoutActivity($cinescenies)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
@@ -42,10 +41,10 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
             SELECT s
             FROM AppBundle:Schedule s
             WHERE s.activity IS NULL
-            AND s.cinescenie = :cinescenie
+            AND s.cinescenie IN (:cinescenies)
             '
         )->setParameters([
-            'cinescenie' => $cinescenie,
+            'cinescenies' => $cinescenies,
         ]);
         $schedules = $query->getResult();
 

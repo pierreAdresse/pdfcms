@@ -3,23 +3,24 @@
 {% block sections %}
     <section>
         <header class="main">
-            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+            <h2>Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y') }}</h2>
         </header>
 
-        <h3>Modification du mot de passe</h3>
+        <h3>Choix de la personne pour le rôle : {{ activity.name }}</h3>
         
         {{ form_start(form) }}
             <div class="row uniform">
-                <div class="4u 12u$(xsmall)">
-                    <label>Nouveau mot de passe</label>
-                    {{ form_widget(form.plainPassword) }}
+                <div class="12u$">
+                    <div class="select-wrapper">
+                        {{ form_widget(form.members) }}
+                    </div>
                 </div>
             </div>
 
             <div class="row uniform">
                 <div class="12u$">
                     <ul class="actions align-right">
-                        <li><a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button">Retour</a></li>
+                        <li><a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}" class="button">Retour</a></li>
                         <li><input type="submit" value="Enregistrer" class="special" /></li>
                     </ul>
                 </div>

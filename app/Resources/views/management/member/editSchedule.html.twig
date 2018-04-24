@@ -3,7 +3,7 @@
 {% block sections %}
     <section>
         <header class="main">
-            <h2>{{ user.firstname }} {{ user.lastname }}</h2>
+            <h2>{{ member.firstname }} {{ member.lastname }}</h2>
         </header>
 
         <h3>Planning {{ year }}</h3>
@@ -22,7 +22,7 @@
                         {% set entity = form.cinescenies.vars.choices[index].data %}
                         {% set activityName = '' %}
                         {% for schedule in entity.schedules %}
-                            {% if schedule.user == user and schedule.activity %}{% set activityName = schedule.activity.name %}{% endif %}
+                            {% if schedule.member == member and schedule.activity %}{% set activityName = schedule.activity.name %}{% endif %}
                         {% endfor %}
                         <tr>
                             <td>
@@ -40,7 +40,7 @@
             <div class="row uniform">
                 <div class="12u$">
                     <ul class="actions align-right">
-                        <li><a href="{{ path('userGeneral', {'userSlug': user.username}) }}" class="button">Retour</a></li>
+                        <li><a href="{{ path('memberGeneral', {'member': member.id}) }}" class="button">Retour</a></li>
                         <li><input type="submit" value="Enregistrer" class="special" /></li>
                     </ul>
                 </div>

@@ -1,20 +1,8 @@
 <div id="sidebar">
     <div class="inner">
-        {#
-        {% block sidebar_search %}
-            {% include 'sidebar/search.html.twig' %}
-        {% endblock %}
-        #}
-
         {% block sidebar_menu %}
             {% include 'sidebar/menu.html.twig' %}
         {% endblock %}
-
-        {#
-        {% block sidebar_sections %}
-            {% include 'sidebar/sections.html.twig' %}
-        {% endblock %}
-        #}
 
         {% block sidebar_footer %}
             {% include 'sidebar/footer.html.twig' %}

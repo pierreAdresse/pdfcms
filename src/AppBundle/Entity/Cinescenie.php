@@ -15,6 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Cinescenie
 {
+    const MIN = 15;
+
     use TimestampableEntity;
     use BlameableEntity;
 

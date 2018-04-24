@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y') }}</h2>
+        </header>
+
+        {% for flash_message in app.session.flashBag.get('notice') %}
+          <div class="box">
+              <p>{{ flash_message }}</p>
+          </div>
+        {% endfor %}
+
+        <h3>Planning</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Rôle</th>
+                    <th>Utilisateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                    <tr>
+                        <td>
+                            <a href="{{ path('memberScheduleEditActivity', {'cinescenie': cinescenie.id, 'activity': activity.id}) }}">{{ activity.name }}</a>
+                        </td>
+                        <td>
+                            {% for schedule in schedules %}
+                                {% if schedule.member %}
+                                    {% if schedule.activity == activity %}
+                                        {% if schedule.member.deleted %}
+                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                        {% else %}
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> {% if schedule.specialty %}({{ schedule.specialty.name }}){% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Spécialité</th>
+                    <th>Utilisateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for specialty in specialties %}
+                    <tr>
+                        <td>
+                            <a href="{{ path('memberScheduleEditSpecialty', {'cinescenie': cinescenie.id, 'specialty': specialty.id}) }}">{{ specialty.name }}</a>
+                        </td>
+                        <td>
+                            {% for schedule in schedules %}
+                                {% if schedule.member %}
+                                    {% if schedule.specialty == specialty %}
+                                        {% if schedule.member.deleted %}
+                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                        {% else %}
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p>
+            Personnes présentes sans rôle d'attribué :
+            {% for schedule in schedules %}
+                {% if schedule.member %}
+                    {% if schedule.activity is null %}
+                        {% if schedule.member.deleted == 0 %}
+                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> |
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </p>
+
+        <div class="row uniform">
+            <div class="12u$">
+                <ul class="actions align-right">
+                    <li><a href="{{ path('memberSchedule') }}" class="button">Retour</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+{% endblock %}

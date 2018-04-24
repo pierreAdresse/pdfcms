@@ -2,7 +2,7 @@
 
 namespace AppBundle\Repository;
 
-use AppBundle\Entity\User;
+use AppBundle\Entity\Member;
 
 /**
  * ScheduleRepository
@@ -12,7 +12,7 @@ use AppBundle\Entity\User;
  */
 class ScheduleRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getLastActivity(User $user, $from, $to)
+    public function getLastActivity($member, $from, $to)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
@@ -20,13 +20,35 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
             SELECT s
             FROM AppBundle:Schedule s
             JOIN s.cinescenie c WITH (c.date > :from AND c.date < :to)
-            WHERE s.user = :user
+            WHERE s.member = :member
+            AND s.activity IS NOT NULL
             ORDER BY c.date DESC
             '
         )->setParameters([
-            'user' => $user,
-            'from' => $from,
-            'to'   => $to,
+            'member'  => $member,
+            'from'    => $from,
+            'to'      => $to,
+        ]);
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
+
+    public function getLastSpecialty(Member $member, $from, $to)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT s
+            FROM AppBundle:Schedule s
+            JOIN s.cinescenie c WITH (c.date > :from AND c.date < :to)
+            WHERE s.member = :member
+            ORDER BY c.date DESC
+            '
+        )->setParameters([
+            'member' => $member,
+            'from'   => $from,
+            'to'     => $to,
         ]);
         $schedules = $query->getResult();
 

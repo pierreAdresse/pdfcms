@@ -6,13 +6,13 @@
             <h2>Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y') }}</h2>
         </header>
 
-        <h3>Choix de la personne pour le rôle : {{ activity.name }}</h3>
+        <h3>Choix de la personne pour le rôle : {{ specialty.name }}</h3>
         
         {{ form_start(form) }}
             <div class="row uniform">
                 <div class="12u$">
                     <div class="select-wrapper">
-                        {{ form_widget(form.users) }}
+                        {{ form_widget(form.members) }}
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
             <div class="row uniform">
                 <div class="12u$">
                     <ul class="actions align-right">
-                        <li><a href="{{ path('userScheduleEditActivities', {'cinescenie': cinescenie.id}) }}" class="button">Retour</a></li>
+                        <li><a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}" class="button">Retour</a></li>
                         <li><input type="submit" value="Enregistrer" class="special" /></li>
                     </ul>
                 </div>

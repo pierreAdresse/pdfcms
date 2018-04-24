@@ -7,22 +7,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use AppBundle\Entity\Skill;
 
-class ChoiceUserForActivityType extends AbstractType
+class ChoiceMemberForActivityType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $users = $options['data'];
+        $members = $options['data'];
 
         $builder
-            ->add('users', ChoiceType::class, [
+            ->add('members', ChoiceType::class, [
                 'choices' => [
-                    $options['activityName'] => $users,
-                    'Autre(s)' => $options['secondaryUsers'],
+                    $options['activityName'] => $members,
+                    'Autre(s)' => $options['secondaryMembers'],
                 ],
-                'choice_label' => function($user, $key, $index) {
-                    return $user->getFirstname().' '.$user->getLastname();
+                'choice_label' => function($member, $key, $index) {
+                    if (is_null($member)) {
+                        return '';
+                    } else {
+                        return $member->getFirstname().' '.$member->getLastname();
+                    }
                 },
-                'data' => $options['userSelected'],
+                'data' => $options['memberSelected'],
                 'empty_data' => null,
                 'required' => false,
             ]
@@ -32,8 +36,8 @@ class ChoiceUserForActivityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'userSelected'   => null,
-            'secondaryUsers' => [],
+            'memberSelected'   => null,
+            'secondaryMembers' => [],
             'activityName'   => '',
         ]);
     }

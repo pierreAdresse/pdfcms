@@ -6,25 +6,26 @@
             <h2>Planning</h2>
         </header>
 
-        <p>
-            <i class="fa fa-check"></i> : Date où tous les participants pour les rôles sont trouvés.<br>
-            <i class="fa fa-times"></i> : Date où il manque des participants.
-        </p>
-
         {% for flash_message in app.session.flashBag.get('notice') %}
           <div class="box">
               <p>{{ flash_message }}</p>
           </div>
         {% endfor %}
 
+        <p>
+            <i class="fa fa-check"></i> : Date où tous les participants pour les rôles sont trouvés.<br>
+            <i class="fa fa-times"></i> : Date où il manque des participants.
+        </p>
+
         <h3>Dates à venir</h3>
 
-        <table>
+        <table class="compact">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Date</th>
                     <th>Présence</th>
-                    <th>Total</th>
+                    <th class="align-right">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,9 +33,6 @@
                     {% if cinescenie.date|date('ymd') >= 'now'|date('ymd') %}
                         <tr>
                             <td>
-                                <a href="{{ path('userScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
-                                    {{ cinescenie.date|date("d/m/y") }}
-                                </a>
                                 {% if cinescenie.schedules|length == numberActivities %}
                                     <i class="fa fa-check"></i>
                                 {% else %}
@@ -42,14 +40,21 @@
                                 {% endif %} 
                             </td>
                             <td>
+                                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
+                                    {{ cinescenie.date|date("d/m/y") }}
+                                </a>
+                            </td>
+                            <td>
                                 {% for schedule in cinescenie.schedules %}
-                                    {% if schedule.user.deleted %}
-                                        {{ schedule.user.firstname }} {{ schedule.user.lastname }}
-                                    {% else %}
-                                        <a href="{{ path('userGeneral', {'userSlug': schedule.user.username}) }}">{{ schedule.user.firstname }} {{ schedule.user.lastname|first }}</a>
+                                    {% if schedule.member %}
+                                        {% if schedule.member.deleted %}
+                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                        {% else %}
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
+                                        {% endif %}
+                                        {% if schedule.activity %} ({{ schedule.activity.name }} {% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
+                                        {% if not loop.last %}, {% endif %}
                                     {% endif %}
-                                    {% if schedule.activity %} ({{ schedule.activity.name }}){% endif %}
-                                    {% if not loop.last %}, {% endif %}
                                 {% endfor %}
                             </td>
                             <td class="align-right">{{ cinescenie.schedules|length }}</td>
@@ -61,12 +66,12 @@
 
         <h3>Dates passées</h3>
 
-        <table>
+        <table class="compact">
             <thead>
                 <tr>
                     <th>Date</th>
                     <th>Présence</th>
-                    <th>Total</th>
+                    <th class="align-right">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -74,7 +79,7 @@
                     {% if cinescenie.date|date('ymd') < 'now'|date('ymd') %}
                         <tr>
                             <td>
-                                <a href="{{ path('userScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
+                                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
                                     {{ cinescenie.date|date("d/m/y") }}
                                 </a>
                                 {% if cinescenie.schedules|length == numberActivities %}
@@ -85,13 +90,15 @@
                             </td>
                             <td>
                                 {% for schedule in cinescenie.schedules %}
-                                    {% if schedule.user.deleted %}
-                                        {{ schedule.user.firstname }} {{ schedule.user.lastname }}
-                                    {% else %}
-                                        <a href="{{ path('userGeneral', {'userSlug': schedule.user.username}) }}">{{ schedule.user.firstname }} {{ schedule.user.lastname|first }}</a>
+                                    {% if schedule.member %}
+                                        {% if schedule.member.deleted %}
+                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                        {% else %}
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
+                                        {% endif %}
+                                        {% if schedule.activity %} ({{ schedule.activity.name }} {% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
+                                        {% if not loop.last %}, {% endif %}
                                     {% endif %}
-                                    {% if schedule.activity %} ({{ schedule.activity.name }}){% endif %}
-                                    {% if not loop.last %}, {% endif %}
                                 {% endfor %}
                             </td>
                             <td class="align-right">{{ cinescenie.schedules|length }}</td>

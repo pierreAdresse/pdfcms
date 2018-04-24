@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>{{ member.firstname }} {{ member.lastname }}</h2>
+        </header>
+
+
+        {{ form_start(form) }}
+            <div class="row uniform">
+                <div class="12u$">
+                    <h3>Spécialités</h3>
+
+                    <table>
+                        <tbody>
+                            {% for specialty in form.specialties %}
+                                <tr>
+                                    <td >
+                                        {{ form_widget(specialty) }}
+                                        {{ form_label(specialty, null, { 'label_attr': {'class': 'without-margin'} }) }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row uniform">
+                <div class="12u$">
+                    <ul class="actions align-right">
+                        <li><a href="{{ path('memberGeneral', {'member': member.id}) }}" class="button">Retour</a></li>
+                        <li><input type="submit" value="Enregistrer" class="special" /></li>
+                    </ul>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

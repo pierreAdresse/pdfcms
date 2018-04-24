@@ -41,19 +41,19 @@ class Skill
 
 
     /**
-     * @ORM\OneToMany(targetEntity="UserSkill", mappedBy="skill")
+     * @ORM\OneToMany(targetEntity="MemberSkill", mappedBy="skill")
      */
-    private $userSkills;
+    private $memberSkills;
 
     /**
-     * @ORM\OneToMany(targetEntity="User", mappedBy="mainSkill")
+     * @ORM\OneToMany(targetEntity="Member", mappedBy="mainSkill")
      */
-    private $users;
+    private $members;
 
     public function __construct() {
         $this->skillActivities = new ArrayCollection();
-        $this->userSkills      = new ArrayCollection();
-        $this->users           = new ArrayCollection();
+        $this->memberSkills    = new ArrayCollection();
+        $this->members         = new ArrayCollection();
     }
 
     /**
@@ -125,70 +125,70 @@ class Skill
     }
 
     /**
-     * Add userSkill
+     * Add member
      *
-     * @param \AppBundle\Entity\UserSkill $userSkill
+     * @param \AppBundle\Entity\Member $member
      *
      * @return Skill
      */
-    public function addUserSkill(\AppBundle\Entity\UserSkill $userSkill)
+    public function addMember(\AppBundle\Entity\Member $member)
     {
-        $this->userSkills[] = $userSkill;
+        $this->members[] = $member;
 
         return $this;
     }
 
     /**
-     * Remove userSkill
+     * Remove member
      *
-     * @param \AppBundle\Entity\UserSkill $userSkill
+     * @param \AppBundle\Entity\Member $member
      */
-    public function removeUserSkill(\AppBundle\Entity\UserSkill $userSkill)
+    public function removeMember(\AppBundle\Entity\Member $member)
     {
-        $this->userSkills->removeElement($userSkill);
+        $this->members->removeElement($member);
     }
 
     /**
-     * Get userSkills
+     * Get members
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUserSkills()
+    public function getMembers()
     {
-        return $this->userSkills;
+        return $this->members;
     }
 
     /**
-     * Add user
+     * Add memberSkill
      *
-     * @param \AppBundle\Entity\User $user
+     * @param \AppBundle\Entity\MemberSkill $memberSkill
      *
      * @return Skill
      */
-    public function addUser(\AppBundle\Entity\User $user)
+    public function addMemberSkill(\AppBundle\Entity\MemberSkill $memberSkill)
     {
-        $this->users[] = $user;
+        $this->memberSkills[] = $memberSkill;
 
         return $this;
     }
 
     /**
-     * Remove user
+     * Remove memberSkill
      *
-     * @param \AppBundle\Entity\User $user
+     * @param \AppBundle\Entity\MemberSkill $memberSkill
      */
-    public function removeUser(\AppBundle\Entity\User $user)
+    public function removeMemberSkill(\AppBundle\Entity\MemberSkill $memberSkill)
     {
-        $this->users->removeElement($user);
+        $this->memberSkills->removeElement($memberSkill);
     }
 
     /**
-     * Get users
+     * Get memberSkills
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getUsers()
+    public function getMemberSkills()
     {
-        return $this->users;
+        return $this->memberSkills;
     }
 }

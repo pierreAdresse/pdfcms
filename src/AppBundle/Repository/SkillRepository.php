@@ -10,17 +10,17 @@ namespace AppBundle\Repository;
  */
 class SkillRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function getByUser($user)
+    public function getByMember($member)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
             SELECT s
             FROM AppBundle:Skill s
-            JOIN s.userSkills us WITH (us.user = :user)
+            JOIN s.memberSkills ms WITH (ms.member = :member)
             '
         )->setPArameters([
-        	'user' => $user
+        	'member' => $member
         ]);
         $skills = $query->getResult();
 

@@ -55,6 +55,11 @@ class Activity
     private $skillActivities;
 
     /**
+     * @ORM\OneToMany(targetEntity="SpecialtyActivity", mappedBy="activity")
+     */
+    private $specialtyActivities;
+
+    /**
      * @var int
      *
      * @ORM\Column(name="ranking", type="integer", unique=false)
@@ -245,5 +250,39 @@ class Activity
     public function getAllowForDivision()
     {
         return $this->allowForDivision;
+    }
+
+    /**
+     * Add specialtyActivity
+     *
+     * @param \AppBundle\Entity\SpecialtyActivity $specialtyActivity
+     *
+     * @return Activity
+     */
+    public function addSpecialtyActivity(\AppBundle\Entity\SpecialtyActivity $specialtyActivity)
+    {
+        $this->specialtyActivities[] = $specialtyActivity;
+
+        return $this;
+    }
+
+    /**
+     * Remove specialtyActivity
+     *
+     * @param \AppBundle\Entity\SpecialtyActivity $specialtyActivity
+     */
+    public function removeSpecialtyActivity(\AppBundle\Entity\SpecialtyActivity $specialtyActivity)
+    {
+        $this->specialtyActivities->removeElement($specialtyActivity);
+    }
+
+    /**
+     * Get specialtyActivities
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getSpecialtyActivities()
+    {
+        return $this->specialtyActivities;
     }
 }

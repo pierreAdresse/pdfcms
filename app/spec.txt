@@ -134,6 +134,7 @@ Répartition des rôles :
     // Priotité dans le choix
         /*
         Nombre de fois que le rôle à été fait (le plus petit en priorité)
+        Nombre de rôle déjà joué dans la saison
         /!\ Nombre de présence dans l'année (le plus petit en priorité) /!\ Pas effectué car techniquement difficile, la personne devrait être là plus souvent
         */
     // Cas d'un rôle qui n'est pas trouvé : A charge des utilisateurs de trouver une solution. Un indicateur permet de savoir qu'elles sont les Cinéscénies où tous les rôles sont trouvés ou non.
@@ -141,7 +142,7 @@ Répartition des rôles :
 ----
 
 Tableau de bord :
-- Affichage de tous les avertissements comme les utilisateurs qui ont moins de 15 séances dans la saison, les Cinéscénies avec des rôles sans personne, ...
+- OK : Affichage de tous les avertissements comme les utilisateurs qui ont moins de 15 séances dans la saison, les Cinéscénies avec des rôles sans personne, ...
 
 ----
 
@@ -177,3 +178,48 @@ Général :
 - OK : Contrôler que sur plusieurs répartition en même temps alors ça prend bien en compte les répartitions précédentes (à la deuxième prend en compte la première par exemple).
 
 ----
+
+- OK : Ajouter une table "member" afin de diférencier les utilisateurs du site et les membres du groupe Neopter
+- OK : Ajouter la notion de spécialisation afin de pourvoir définir des rôles secondaires et transversales par rapport aux catégories et aux rôles.
+
+Pour choisir un spécialiste il faut :
+- Choisir un membre spécialiste qui n'a pas fait ce rôle la dernière fois et qui l'a peu fait
+    -> Si pas trouvé alors essayer avec un membre qui l'a déjà fait la dernière fois et qui l'a peu fait
+- Trouver un rôle que le membre n'a pas fait la dernière fois et dont il a les compétences (on admettra que ces personnes peuvent faire plusieurs autres rôles puisque ce sont des spécialistes ... donc pas de vérification si un rôle est trouvé car il y en aura forcément de disponibles).
+- Garder en tête que ce rôle et ce membre sont occupés pour la suite de la répartition
+
+----
+
+Remarques :
+- OK : Le fait de choisir un rôle en fonction de ceux le moins fait est bien mais cette technique n'est pas optimisée car il existe plein de rôle similaire ce qui empêche la diversification de l'enchainement des rôles donc il faudrait choisir dans un premier temps le groupe de rôle le moins fait puis à l'intérieur le rôle le moins fait ?! C'est sans doute vrai pour la partie spécialité car nous partons d'un groupe d'activité et nous en choississons une pour un seul membre sans prendre en compte le groupe de rôle déjà effectué. Et pour la partie de la répartition classique nous partons d'un rôle et nous regardons qui le membre qui l'a moins fait, c'est l'inverse. A VERIFIER avec plein de membres. Après vérification il se trouve que la répartition fonctionne plutôt bien sur l'année mais effectivement ça ne tourne pas assez sur peu de dates. Et par exemple les membres feront plus souvent neopter car il y a plus de rôle. Il serait bien d'ajouter une optimisation sur le nombre de fois qu'un membre à fait le groupe de rôle.
+- OK : Corrigé / BUG : Il n'est pas possible d'enlever la compétence principale d'un membre
+- OK : Cas non géré : si un membre à une spécialité et qu'il est enlevé de ce rôle alors sa spécialité n'est pas supprimée. Il n'est pas non plus possible de l'attribuer à quelqu'un d'autre. La solution serait de mettre une partie spécialité sous l'édition des rôles et de pouvoir choisir une personne comme pour chaque rôle. Il faudrait également mettre en place des systèmes d'alerte quand il n'y a personne pour faire la spécialité (y compris dans le tableau de bord).
+- OK : Le mode compétence principale semble prendre trop le dessus par rapport au reste. A TESTER. Le quota s'applique désormais au groupe de rôle et non plus au rôle.
+
+----
+
+Equilibrage :
+- Un déséquilibre apparaît car l'algo essaye de faire jouer tout le monde autant de fois sur tout les rôles sauf que certains ont plus de comptences que d'autres donc ils jouent sur plus de rôles différents. Une piste d'optimisation serait de trier à un moment donné les membres par le nombre activité global effectué.
+
+----
+
+// Choix d'un rôle
+    // T1
+    /*
+        Membres avec la compétence demandée
+        Membre avec comme compétence principale la compétence demandée et le quota non atteint
+        Membres présents et qui ne sont pas déjà sélectionnés
+        Membre dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
+        Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+        Membres dont le nombre de fois fait le groupe de rôle est le plus petit
+        Membres dont le nombre de fois fait le rôle est le plus petit
+    */
+    // T2
+    /*
+        Membres avec la compétence demandée
+        Membres présents et qui ne sont pas déjà sélectionnés
+        Membre dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
+        Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+        Membres dont le nombre de fois fait le groupe de rôle est le plus petit
+        Membres dont le nombre de fois fait le rôle est le plus petit
+    */

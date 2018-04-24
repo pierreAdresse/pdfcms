@@ -15,7 +15,7 @@ class Cinescenie
 	{
 		$this->em          = $em;
         $this->serviceDate = $serviceDate;
-        $this->quota       = 15;
+        $this->quota       = 7;
 	}
 
     /*
@@ -35,13 +35,13 @@ class Cinescenie
         return $cinescenies;
 	}
 
-    public function getCurrentsByUser($user)
+    public function getCurrentsByMember($member)
     {
         $date = $this->serviceDate->getSeasonDate();
 
         $cinescenies = $this->em
             ->getRepository('AppBundle:Cinescenie')
-            ->getByUserAndDateGreaterThan($user, $date)
+            ->getByMemberAndDateGreaterThan($member, $date)
         ;
 
         return $cinescenies;

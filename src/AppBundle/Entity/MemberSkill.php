@@ -7,12 +7,12 @@ use Gedmo\Blameable\Traits\BlameableEntity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * UserSkill
+ * MemberSkill
  *
- * @ORM\Table(name="user_skill")
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserSkillRepository")
+ * @ORM\Table(name="member_skill")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\MemberSkillRepository")
  */
-class UserSkill
+class MemberSkill
 {
     use TimestampableEntity;
     use BlameableEntity;
@@ -27,13 +27,13 @@ class UserSkill
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="userSkills")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Member", inversedBy="memberSkills")
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
      */
-    private $user;
+    private $member;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Skill", inversedBy="userSkills")
+     * @ORM\ManyToOne(targetEntity="Skill", inversedBy="memberSkills")
      * @ORM\JoinColumn(name="skill_id", referencedColumnName="id")
      */
     private $skill;
@@ -49,27 +49,27 @@ class UserSkill
     }
 
     /**
-     * Set user
+     * Set member
      *
-     * @param \AppBundle\Entity\User $user
+     * @param \AppBundle\Entity\Member $member
      *
-     * @return UserSkill
+     * @return MemberSkill
      */
-    public function setUser(\AppBundle\Entity\User $user = null)
+    public function setMember(\AppBundle\Entity\Member $member = null)
     {
-        $this->user = $user;
+        $this->member = $member;
 
         return $this;
     }
 
     /**
-     * Get user
+     * Get member
      *
-     * @return \AppBundle\Entity\User
+     * @return \AppBundle\Entity\Member
      */
-    public function getUser()
+    public function getMember()
     {
-        return $this->user;
+        return $this->member;
     }
 
     /**
@@ -77,7 +77,7 @@ class UserSkill
      *
      * @param \AppBundle\Entity\Skill $skill
      *
-     * @return UserSkill
+     * @return MemberSkill
      */
     public function setSkill(\AppBundle\Entity\Skill $skill = null)
     {

@@ -33,16 +33,22 @@ class Schedule
     private $cinescenie;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="schedules")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedules")
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
      */
-    private $user;
+    private $member;
 
     /**
      * @ORM\ManyToOne(targetEntity="Activity", inversedBy="schedules")
      * @ORM\JoinColumn(name="activity_id", referencedColumnName="id")
      */
     private $activity;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Specialty", inversedBy="schedules")
+     * @ORM\JoinColumn(name="specialty_id", referencedColumnName="id")
+     */
+    private $specialty;
 
     /**
      * Get id
@@ -79,30 +85,6 @@ class Schedule
     }
 
     /**
-     * Set user
-     *
-     * @param \AppBundle\Entity\User $user
-     *
-     * @return Schedule
-     */
-    public function setUser(\AppBundle\Entity\User $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \AppBundle\Entity\User
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
      * Set activity
      *
      * @param \AppBundle\Entity\Activity $activity
@@ -124,5 +106,53 @@ class Schedule
     public function getActivity()
     {
         return $this->activity;
+    }
+
+    /**
+     * Set member
+     *
+     * @param \AppBundle\Entity\Member $member
+     *
+     * @return Schedule
+     */
+    public function setMember(\AppBundle\Entity\Member $member = null)
+    {
+        $this->member = $member;
+
+        return $this;
+    }
+
+    /**
+     * Get member
+     *
+     * @return \AppBundle\Entity\Member
+     */
+    public function getMember()
+    {
+        return $this->member;
+    }
+
+    /**
+     * Set specialty
+     *
+     * @param \AppBundle\Entity\Specialty $specialty
+     *
+     * @return Schedule
+     */
+    public function setSpecialty(\AppBundle\Entity\Specialty $specialty = null)
+    {
+        $this->specialty = $specialty;
+
+        return $this;
+    }
+
+    /**
+     * Get specialty
+     *
+     * @return \AppBundle\Entity\Specialty
+     */
+    public function getSpecialty()
+    {
+        return $this->specialty;
     }
 }

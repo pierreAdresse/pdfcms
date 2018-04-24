@@ -1,61 +1,12 @@
 {% set menu = {'items':
     [
-        { 'route': 'userList', 'label': 'Liste des membres', 'role': 'ROLE_ADMIN', 'isActiveFor': ['userGeneral', 'userEditSchedule', 'userEditSkills'] },
-        { 'route': 'userSchedule', 'label': 'Planning', 'role': 'ROLE_ADMIN', 'isActiveFor': ['userScheduleEditActivities', 'userScheduleEditActivity'] },
-        { 'route': 'userActivityDivision', 'label': 'Répartition des rôles', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
-        { 'route': 'userDashboard', 'label': 'Tableau de bord', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
+        { 'route': 'memberList', 'label': 'Liste des membres', 'role': 'ROLE_ADMIN', 'isActiveFor': ['home', 'memberGeneral', 'memberEditSchedule', 'memberEditSkills'] },
+        { 'route': 'memberSchedule', 'label': 'Planning', 'role': 'ROLE_ADMIN', 'isActiveFor': ['memberScheduleEditActivities', 'memberScheduleEditActivity'] },
+        { 'route': 'memberActivityDivision', 'label': 'Répartition des rôles', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
+        { 'route': 'memberDashboard', 'label': 'Tableau de bord', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
         { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter', 'role': 'ROLE_USER', 'isActiveFor': [] },
     ]
 } %}
-
-{#
-{% set menu = {'items':
-    [
-        { 'route': 'topicalities', 'label': 'Actualités', 'role': 'ROLE_USER' },
-        { 'route': 'informations', 'label': 'Informations', 'role': 'ROLE_USER' },
-        { 'route': 'requestForVisit', 'label': 'Demande de visite', 'role': 'ROLE_USER' },
-        { 'route': 'userList', 'label': 'Gestion du groupe', 'role': 'ROLE_RESPONSABLE_GROUPE', 'submenu': [
-            { 'route': 'userList', 'label': 'Tableau de bord' },
-            { 'route': 'userList', 'label': 'Liste des membres' },
-            { 'route': 'userSchedule', 'label': 'Planning' },
-            { 'route': 'userActivityDivision', 'label': 'Répartition des rôles' },
-            { 'route': 'userList', 'label': 'Actualités' },
-            { 'route': 'userList', 'label': 'Informations' },
-            { 'route': 'userList', 'label': 'Visites' },
-        ]},
-        { 'route': 'userList', 'label': 'Gestion du village', 'role': 'ROLE_RESPONSABLE_VILLAGE', 'submenu': [
-            { 'route': 'userList', 'label': 'Liste des membres' },
-            { 'route': 'userList', 'label': 'Groupes' },
-            { 'route': 'userList', 'label': 'Actualités' },
-            { 'route': 'userList', 'label': 'Informations' },
-            { 'route': 'userList', 'label': 'Visites' },
-        ]},
-        { 'route': 'userList', 'label': 'Gestion de la Cinéscénie', 'role': 'ROLE_RESPONSABLE_CINESCENIE', 'submenu': [
-            { 'route': 'userList', 'label': 'Liste des membres' },
-            { 'route': 'userList', 'label': 'Villages' },
-            { 'route': 'userList', 'label': 'Actualités' },
-            { 'route': 'userList', 'label': 'Informations' },
-            { 'route': 'userList', 'label': 'Visites' },
-        ]},
-        { 'route': 'setting', 'label': 'Paramétrage', 'role': 'ROLE_ADMIN', 'submenu': [
-            { 'route': 'userList', 'label': 'Général' },
-            { 'route': 'userList', 'label': 'Cinéscénies' },
-            { 'route': 'userList', 'label': 'Utilisateurs' },
-            { 'route': 'userList', 'label': 'Autorisations' },
-            { 'route': 'userList', 'label': 'Catégorie de rôles' },
-            { 'route': 'userList', 'label': 'Rôles' },
-            { 'route': 'userList', 'label': 'Compétences' },
-            { 'route': 'userList', 'label': 'Rôles par compétence' },
-        ]},
-        { 'route': 'myAccount', 'label': 'Mon compte', 'role': 'ROLE_USER', 'submenu': [
-            { 'route': 'myAccount', 'label': 'Informations personnelles' },
-            { 'route': 'mySchedule', 'label': 'Planning' },
-            { 'route': 'editMyPassword', 'label': 'Changer son mot de passe' },
-            { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter' },
-        ]},
-    ]
-} %}
-#}
 
 <nav id="menu">
     <header class="major">

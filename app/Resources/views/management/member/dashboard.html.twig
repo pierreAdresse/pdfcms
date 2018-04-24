@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>Tableau de bord</h2>
+        </header>
+
+	    <h3>Personnes avec moins de 15 séances de présence</h3>
+
+	    <p>
+	        {% for member in members %}
+	            {% if member.countCinescenies < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
+	                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].firstname }} {{ member[0].lastname }}</a> |
+	            {% endif %}
+	        {% endfor %}
+	    </p>
+
+	    <h3>Cinéscénie dans lesquelles il manque des personnes</h3>
+
+	    <p>
+	        {% for cinescenie in cinescenies %}
+	            {% if cinescenie.numberSchedules != numberActivities %}
+	            	{% set diff = numberActivities - cinescenie.numberSchedules %}
+                    <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie[0].id}) }}">
+                        {{ cinescenie[0].date|date("d/m/y") }}
+                    </a> (besoin de {{ diff }}) |
+	            {% endif %}
+	        {% endfor %}
+	    </p>
+    </section>
+{% endblock %}

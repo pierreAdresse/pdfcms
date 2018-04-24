@@ -1,0 +1,256 @@
+{% extends 'base.html.twig' %}
+
+{% block sections %}
+    <section>
+        <header class="main">
+            <h2>{{ member.firstname }} {{ member.lastname }}</h2>
+        </header>
+
+        {% for flash_message in app.session.flashBag.get('notice') %}
+          <div class="box">
+              <p>{{ flash_message }}</p>
+          </div>
+        {% endfor %}
+
+        <div class="row uniform">
+            <div class="6u 12u$(xsmall)">
+                <h3>Informations personnelles</h3>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Prénom</td>
+                                <td>{{ member.firstname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Nom</td>
+                                <td>{{ member.lastname }}</td>
+                            </tr>
+                            <tr>
+                                <td>Email</td>
+                                <td>{{ member.email }}</td>
+                            </tr>
+                            <tr>
+                                <td>Téléphone</td>
+                                <td>{{ member.phone }}</td>
+                            </tr>
+                            <tr>
+                                <td>Mobile</td>
+                                <td>{{ member.mobile }}</td>
+                            </tr>
+                            <tr>
+                                <td>Adresse</td>
+                                <td>{{ member.address }}</td>
+                            </tr>
+                            <tr>
+                                <td>Code PDF</td>
+                                <td>{{ member.code }}</td>
+                            </tr>
+                            <tr>
+                                <td>Arrivée au PDF</td>
+                                <td>{{ member.arrival|date("Y") }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <hr>
+
+                <h3>Compétence principale</h3>
+                <p>{% if member.mainSkill is not null %}{{ member.mainSkill.name }}{% else %}Aucune{% endif %}</p>
+
+                <hr>
+
+                <h3>Compétences</h3>
+
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <tbody>
+                                {% for skill in skills %}
+                                  <tr>
+                                      <td>
+                                        {% set hasSkill = false %}
+                                        {% for memberSkill in member.memberSkills %}
+                                            {% if skill == memberSkill.skill %}{% set hasSkill = true %}{% endif %}
+                                        {% endfor %}
+                                        <input type="checkbox"{% if hasSkill %} checked{% endif %}>
+                                        <label class="without-margin">{{ skill.name }}</label>
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('memberEditSkills', {'member': member.id}) }}">
+                                Modifier les compétences
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h3>Spécialités</h3>
+
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <tbody>
+                                {% for specialty in specialties %}
+                                  <tr>
+                                      <td>
+                                        {% set hasSpecialty = false %}
+                                        {% for memberSpecialty in member.memberSpecialties %}
+                                            {% if specialty == memberSpecialty.specialty %}{% set hasSpecialty = true %}{% endif %}
+                                        {% endfor %}
+                                        <input type="checkbox"{% if hasSpecialty %} checked{% endif %}>
+                                        <label class="without-margin">{{ specialty.name }}</label>
+                                      </td>
+                                  </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('memberEditSpecialties', {'member': member.id}) }}">
+                                Modifier les spécialités
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="6u 12u$(xsmall)">
+                <h3>Planning {{ year }}</h3>
+
+                {% if count.countCinescenies < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
+		            <div class="box">
+		                <p>
+		                	<i class="fa fa-exclamation"></i> Attention : {{ member.firstname }} ne respecte pas les 15 séances minimum de présence. Actuellement {{ member.schedules|length }} présence(s).
+		                </p>
+		            </div>
+		        {% endif %}
+                <div class="table-wrapper">
+                    <form method="post" action="#">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Rôle</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cinescenie in cinescenies %}
+                                    {% set activityName = '' %}
+                                    {% set specialtyName = '' %}
+                                    {% set presence = false %}
+                                    {% for schedule in cinescenie.schedules %}
+                                        {% if schedule.member == member and schedule.activity %}
+                                            {% set activityName = schedule.activity.name %}
+                                            {% if schedule.specialty %}
+                                                {% set specialtyName = '(' ~ schedule.specialty.name ~ ')' %}
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if schedule.member == member %}{% set presence = true %}{% endif %}
+                                    {% endfor %}
+
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox"{% if presence %} checked{% endif %}>
+                                            <label class="without-margin">{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y')|capitalize }}</label>
+                                        </td>
+                                        <td>
+                                            {% if activityName %}
+                                                {{ activityName }} {{ specialtyName }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+
+                <div class="row uniform">
+                    <div class="5u 12u$(medium)">
+                    </div>
+                    <div class="7u 12u$(medium)">
+                        <p>
+                            <a class="button fit" href="{{ path('memberEditSchedule', {'member': member.id}) }}">
+                                Modifier le planning
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h3>Statistiques par rôle</h3>
+
+                <p>
+                    Nombre total de présences dans la saison : {{ member.schedules|length }}
+                    <br/>
+                    Nombre total de présences avec activité dans la saison : {{ numberPresenceWithActivity }}
+                </p>
+
+                {% set totalPresences = member.schedules|length %}
+
+                <div class="table-wrapper">
+                    <table>
+                        <tbody>
+                            {% for stat in stats %}
+                                {% if totalPresences > 0 %}
+                                    {% set pourcentage = stat.numberOfTimes / totalPresences * 100 %}
+                                {% else %}
+                                    {% set pourcentage = 0 %}
+                                {% endif %}
+                                <tr>
+                                    <td>{{ stat.name }}</td>
+                                    <td>{{ stat.numberOfTimes }}</td>
+                                    <td>{{ pourcentage|number_format(0, '.', '') }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Statistiques par groupe de rôle</h3>
+
+                <div class="table-wrapper">
+                    <table>
+                        <tbody>
+                            {% for gaStat in gaStats %}
+                                {% if totalPresences > 0 %}
+                                    {% set pourcentage = gaStat.numberOfTimes / totalPresences * 100 %}
+                                {% else %}
+                                    {% set pourcentage = 0 %}
+                                {% endif %}
+                                <tr>
+                                    <td>{{ gaStat.name }}</td>
+                                    <td>{{ gaStat.numberOfTimes }}</td>
+                                    <td>{{ pourcentage|number_format(0, '.', '') }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

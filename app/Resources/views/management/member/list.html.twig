@@ -7,7 +7,7 @@
         </header>
 
         <form method="post">
-            <input type="text" id="searchUser" onkeyup="search()" placeholder="Rechercher un utilisateur">
+            <input type="text" id="searchMember" onkeyup="search()" placeholder="Rechercher un membre">
         </form>
 
         <div class="table-wrapper">
@@ -20,20 +20,20 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in users %}
+                    {% for member in members %}
                         <tr>
                             <td>
-                                {% if user['countCinescenies'] < 15 %}
+                                {% if member.countCinescenies < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
                                     <b>
                                         <i class="fa fa-exclamation"></i>
                                     </b>
                                 {% endif %} 
-                                <a href="{{ path('userGeneral', {'userSlug': user[0].username}) }}">{{ user[0].firstname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].firstname }}</a>
                             </td>
                             <td>
-                                <a href="{{ path('userGeneral', {'userSlug': user[0].username}) }}">{{ user[0].lastname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].lastname }}</a>
                             </td>
-                            <td>{{ user['countCinescenies'] }}</td>
+                            <td>{{ member.countCinescenies }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -49,7 +49,7 @@
       function search() {
         // Declare variables
         var input, filter, table, tr, td, i;
-        input = document.getElementById("searchUser");
+        input = document.getElementById("searchMember");
         filter = input.value.toUpperCase();
         table = document.getElementsByTagName("table");
         tr = table[0].getElementsByTagName("tr");

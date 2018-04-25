@@ -28,12 +28,12 @@
                                         <i class="fa fa-exclamation"></i>
                                     </b>
                                 {% endif %} 
-                                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].firstname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}">{{ member.member.firstname }}</a>
                             </td>
                             <td>
-                                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].lastname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}">{{ member.member.lastname }}</a>
                             </td>
-                            <td>{{ member.countCinescenies }}</td>
+                            <td>{{ member.counter }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

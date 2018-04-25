@@ -33,7 +33,7 @@
                     {% if cinescenie.date|date('ymd') >= 'now'|date('ymd') %}
                         <tr>
                             <td>
-                                {% if cinescenie.schedules|length == numberActivities %}
+                                {% if cineComplete[cinescenie.id] %}
                                     <i class="fa fa-check"></i>
                                 {% else %}
                                     <i class="fa fa-times"></i>
@@ -82,7 +82,7 @@
                                 <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
                                     {{ cinescenie.date|date("d/m/y") }}
                                 </a>
-                                {% if cinescenie.schedules|length == numberActivities %}
+                                {% if cineComplete[cinescenie.id] %}
                                     <i class="fa fa-check"></i>
                                 {% else %}
                                     <i class="fa fa-times"></i>

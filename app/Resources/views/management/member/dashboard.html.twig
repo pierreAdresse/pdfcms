@@ -19,13 +19,10 @@
 	    <h3>Cinéscénie dans lesquelles il manque des personnes</h3>
 
 	    <p>
-	        {% for cinescenie in cinescenies %}
-	            {% if cinescenie.numberSchedules != numberActivities %}
-	            	{% set diff = numberActivities - cinescenie.numberSchedules %}
-                    <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie[0].id}) }}">
-                        {{ cinescenie[0].date|date("d/m/y") }}
-                    </a> (besoin de {{ diff }}) |
-	            {% endif %}
+	        {% for cine in cineComplete %}
+                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cine.cinescenie.id}) }}">
+                    {{ cine.cinescenie.date|date("d/m/y") }}
+                </a> (besoin de {{ cine.manque }}) |
 	        {% endfor %}
 	    </p>
     </section>

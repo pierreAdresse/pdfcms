@@ -31,29 +31,41 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/tableau-de-bord", name="memberDashboard")
      */
-    public function dashboardAction(MemberService $serviceMember, Date $serviceDate)
+    public function dashboardAction(MemberService $serviceMember, Date $serviceDate, CinescenieService $serviceCinescenie)
     {
         // Membres qui ont moins de 15 séances
         $members = $serviceMember->getAndCountSchedules();
 
         // Les Cinéscénie avec des rôles sans affectation
         $date        = $serviceDate->getSeasonDate();
-        $cinescenies = $this->getDoctrine()
+        $cinescenies = $serviceCinescenie->getCurrents();
+
+        $countActivitiesCines = $this
+            ->getDoctrine()
             ->getRepository('AppBundle:Cinescenie')
-            ->getCountSchedules($date)
+            ->countActivities($cinescenies)
         ;
 
-        $activities = $this->getDoctrine()
+        $activities = $this
+            ->getDoctrine()
             ->getRepository('AppBundle:Activity')
             ->findBy([
                 'allowForDivision' => true,
             ])
         ;
 
+        $counterActivities = count($activities);
+        $cineComplete      = [];
+        foreach ($countActivitiesCines as $key => $countActivitiesCine) {
+            if ($countActivitiesCine['counter'] < $counterActivities) {
+                $cineComplete[$key]['cinescenie'] = $countActivitiesCine[0];
+                $cineComplete[$key]['manque']     = $counterActivities - $countActivitiesCine['counter'];
+            }
+        }
+
         return $this->render('management/member/dashboard.html.twig', [
-            'members'          => $members,
-            'cinescenies'      => $cinescenies,
-            'numberActivities' => count($activities),
+            'members'      => $members,
+            'cineComplete' => $cineComplete,
         ]);
     }
 
@@ -70,16 +82,33 @@ class ManagementController extends Controller
         $cinescenies = $serviceCinescenie->getCurrents();
         $today       = new \Datetime('now');
 
-        $activities = $this->getDoctrine()
+        $countActivitiesCines = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Cinescenie')
+            ->countActivities($cinescenies)
+        ;
+
+        $activities = $this
+            ->getDoctrine()
             ->getRepository('AppBundle:Activity')
             ->findBy([
                 'allowForDivision' => true,
             ])
         ;
 
+        $counterActivities = count($activities);
+        $cineComplete      = [];
+        foreach ($countActivitiesCines as $countActivitiesCine) {
+            $result = false;
+            if ($countActivitiesCine['counter'] == $counterActivities) {
+                $result = true;
+            }
+            $cineComplete[$countActivitiesCine[0]->getId()] = $result;
+        }
+
         return $this->render('management/member/schedule.html.twig', [
-            'cinescenies'      => $cinescenies,
-            'numberActivities' => count($activities),
+            'cinescenies'  => $cinescenies,
+            'cineComplete' => $cineComplete,
         ]);
     }
 
@@ -125,40 +154,30 @@ class ManagementController extends Controller
 
                 $pastCinescenies = $serviceCinescenie->getCinesceniesBetween($date, $cinescenie->getDate());
 
-                // Choix d'un spécialiste
-                    // Choisir un membre spécialiste qui n'a pas fait ce rôle la dernière fois et qui l'a peu fait
-                        // Si pas trouvé alors essayer avec un membre qui l'a déjà fait la dernière fois et qui l'a peu fait
-                    // Trouver un rôle que le membre n'a pas fait la dernière fois et dont il a les compétences (on admettra que ces personnes peuvent faire plusieurs autres rôles puisque ce sont des spécialistes ... donc pas de vérification si un rôle est trouvé car il y en aura forcément de disponible ... pour le moment).
-                    // Garder en tête que ce rôle et ce membre sont occupés pour la suite de la répartition
-
+                // Choix des spécialistes
+                /*
+                    Membres avec la spécialité demandée
+                    Membres présents et qui ne sont pas déjà sélectionnés
+                    Membres dont la derniere spécialité faite n'est pas celle demandée / Si pas de membres alors ce critère est ignoré
+                    Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+                    Choisir un rôle via le groupe de rôle possible qui n'a été fait la dernière fois et le moins fait puis le rôle possible le moins fait 
+                */
                 $membersSelected    = [];
                 $activitiesComplete = [];
-                /*foreach ($specialties as $specialty) {
-                    $members        = $serviceMember->getForDivisionSpecialty($pastCinescenies, $specialty);
-                    $membersSpe     = $serviceMember->filterMemberPresent($members, $cinescenie, $membersSelected);
-                    $membersSpeSort = $serviceMember->filterByDifferentLastSpecialty($members, $cinescenie, $date, $specialty);
+                foreach ($specialties as $specialty) {
+                    $members      = $serviceMember->getForDivisionSpecialty($specialty);
+                    $memberResult = $serviceMember
+                        ->filterSpecialtyBy($members, $membersSelected, $cinescenie, $date, $specialty)
+                    ;
 
-                    // Pour choisir le rôle :
-                    // Trouver quel était le dernier groupe de rôle effectué par le membre
-                    // En choisir un différent dans la liste des rôles possible et qu'il a peu fait
-                    $memberIsFind = false;
-
-                    if (!empty($membersSpeSort)) {
-                        $member       = $membersSpeSort[0];
-                        $memberIsFind = true;
-                    } elseif (empty($membersSpeSort) && !empty($membersSpe)) {
-                        $member       = $membersSpe[0];
-                        $memberIsFind = true;
-                    } else {
-                        // On ne peut rien faire donc il y aura une alerte sur le planning en question et sur le tableau de bord pour avertir qu'il n'y a pas ce spécialiste.
-                    }
-
-                    if ($memberIsFind) {
-                        $membersSelected[]   = $member->getId();
-                        $lastGroupActivities = $serviceMember->getLastGroupActivities($member, $cinescenie, $date);
-                        $activity            = $serviceMember->getActivityBySpecialityAndLastGroupActivities($member, $specialty, $lastGroupActivities);
-                        $serviceMember->setActivityAndSpecialtyForMember($member, $activity, $specialty, $cinescenie);
+                    if (!is_null($memberResult)) {
+                        $membersSelected[]   = $memberResult;
+                        $lastGroupActivities = $serviceMember->getLastGroupActivities($memberResult, $cinescenie, $date);
+                        $activity            = $serviceMember->getActivityBySpecialityAndLastGroupActivities($memberResult, $specialty, $lastGroupActivities);
+                        $serviceMember->setActivityAndSpecialtyForMember($memberResult, $activity, $specialty, $cinescenie);
                         $activitiesComplete[] = $activity->getId();
+                    } else {
+                        // Aucun membre trouvé donc il y aura une alerte sur le planning en question et sur le tableau de bord pour avertir qu'il n'y a pas ce spécialiste.
                     }
                 }
 
@@ -169,10 +188,10 @@ class ManagementController extends Controller
                     if (!in_array($activity->getId(), $activitiesComplete)) {
                         $filterActivities[] = $activity;
                     }
-                }*/
+                }
 
-                // Choix du rôle
-                foreach ($activities as $activity) {
+                // Choix des rôles
+                foreach ($filterActivities as $activity) {
                     // Récupération des compétences nécéssaires pour le rôle
                     $skillActivities  = $activity->getSkillActivities();
                     $skills           = [];
@@ -211,7 +230,7 @@ class ManagementController extends Controller
                             Membres dont le nombre de fois fait le rôle est le plus petit
                         */
                         $members      = $serviceMember
-                            ->getForDivisionT2($pastCinescenies, $skills, $activity)
+                            ->getForDivisionT2($skills)
                         ;
                         $memberResult = $serviceMember
                             ->filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies)
@@ -741,7 +760,7 @@ class ManagementController extends Controller
      */
     public function listAction(MemberService $serviceMember, Request $request)
     {
-        $members = $serviceMember->getAndCountSchedules();
+        $members = $serviceMember->getCountCinePlayAndCinePresent();
 
         return $this->render('management/member/list.html.twig', [
             'members' => $members,

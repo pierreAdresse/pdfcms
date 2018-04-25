@@ -25,6 +25,26 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
         return $members;
     }
 
+    public function getTotalCinePlay($date) {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT m.id, COUNT(sc.id) AS totalCinePlay
+            FROM AppBundle:Member m
+            JOIN m.schedules sc WITH (sc.activity IS NOT NULL)
+            JOIN sc.cinescenie c WITH (c.date > :date)
+            WHERE m.deleted = 0
+            GROUP BY m.id
+            ORDER BY totalCinePlay ASC
+            '
+        )->setParameters([
+            'date' => $date,
+        ]);
+        $members = $query->getResult();
+
+        return $members;
+    }
+
     public function getAndCountSchedulesForMember($date, $member)
     {
         $em = $this->getEntityManager();
@@ -202,71 +222,45 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
         return $members;
     }
 
-    public function getOrderForDivision($pastCinescenies, $members, $activity)
+    public function getForDivisionSpecialty($specialty)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT m, COUNT(sc.id) AS actNumOfTim
+            SELECT m.id
             FROM AppBundle:Member m
-            LEFT JOIN m.schedules sc WITH (sc.activity = :activity AND sc.cinescenie IN (:pastCinescenies))
-            WHERE m.id IN (:members)
-            GROUP BY m.id
-            ORDER BY actNumOfTim ASC
-            '
-        )->setParameters([
-            'members'         => $members,
-            'activity'        => $activity,
-            'pastCinescenies' => $pastCinescenies,
-        ]);
-        $members = $query->getResult();
-
-        return $members; 
-    }
-
-    public function getOrder2ForDivision($pastCinescenies, $members)
-    {
-        $em = $this->getEntityManager();
-        $query = $em->createQuery(
-            '
-            SELECT m, COUNT(sc.id) AS numOfTim
-            FROM AppBundle:Member m
-            LEFT JOIN m.schedules sc WITH (sc.activity IS NOT NULL AND sc.cinescenie IN (:pastCinescenies))
-            WHERE m.id IN (:members)
-            GROUP BY m.id
-            ORDER BY numOfTim ASC
-            '
-        )->setParameters([
-            'members'         => $members,
-            'pastCinescenies' => $pastCinescenies,
-        ]);
-        $members = $query->getResult();
-
-        return $members; 
-    }
-
-    public function getForDivisionSpecialty($pastCinescenies, $specialty)
-    {
-        $em = $this->getEntityManager();
-        $query = $em->createQuery(
-            '
-            SELECT m, COUNT(sc.id) AS specialtyNumber
-            FROM AppBundle:Member m
-            LEFT JOIN m.schedules sc WITH (sc.specialty = :specialty AND sc.cinescenie IN (:pastCinescenies))
-            JOIN m.memberSpecialties ms
+            JOIN m.memberSpecialties ms WITH ms.specialty = :specialty
             WHERE m.deleted = 0
             GROUP BY m.id
-            ORDER BY specialtyNumber ASC
             '
         )->setParameters([
-            'specialty'       => $specialty,
-            'pastCinescenies' => $pastCinescenies,
+            'specialty' => $specialty,
         ]);
         $members = $query->getResult();
 
         return $members; 
     }
 
+    public function getForDivisionT2($skills)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT m.id
+            FROM AppBundle:Member m
+            JOIN m.memberSkills ms WITH ms.skill IN (:skills)
+            WHERE m.deleted = 0
+            GROUP BY m.id
+            '
+        )->setParameters([
+            'skills' => $skills,
+        ]);
+        $members = $query->getResult();
+
+        return $members; 
+    }
+
+/*
     public function getForDivisionT2($pastCinescenies, $skills, $activities)
     {
         $em = $this->getEntityManager();
@@ -289,6 +283,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
 
         return $members; 
     }
+*/
 
     public function getWithSpecialty($cinescenie, $specialty)
     {

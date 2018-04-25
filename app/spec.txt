@@ -199,27 +199,38 @@ Remarques :
 ----
 
 Equilibrage :
-- Un déséquilibre apparaît car l'algo essaye de faire jouer tout le monde autant de fois sur tout les rôles sauf que certains ont plus de comptences que d'autres donc ils jouent sur plus de rôles différents. Une piste d'optimisation serait de trier à un moment donné les membres par le nombre activité global effectué.
+- OK : Un déséquilibre apparaît car l'algo essaye de faire jouer tout le monde autant de fois sur tout les rôles sauf que certains ont plus de comptences que d'autres donc ils jouent sur plus de rôles différents. Une piste d'optimisation serait de trier à un moment donné les membres par le nombre activité global effectué. Finalement j'ai fait une tri par le ratio du nombre de séances de présence par le nombre de séances jouées.
+
+----
+
+// Choix des spécialistes
+/*
+    Membres avec la spécialité demandée
+    Membres présents et qui ne sont pas déjà sélectionnés
+    Membres dont la derniere spécialité faite n'est pas celle demandée / Si pas de membres alors ce critère est ignoré
+    Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+    Choisir un rôle via le groupe de rôle possible qui n'a été fait la dernière fois et le moins fait puis le rôle possible le moins fait 
+*/
 
 ----
 
 // Choix d'un rôle
-    // T1
-    /*
-        Membres avec la compétence demandée
-        Membre avec comme compétence principale la compétence demandée et le quota non atteint
-        Membres présents et qui ne sont pas déjà sélectionnés
-        Membre dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
-        Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
-        Membres dont le nombre de fois fait le groupe de rôle est le plus petit
-        Membres dont le nombre de fois fait le rôle est le plus petit
-    */
-    // T2
-    /*
-        Membres avec la compétence demandée
-        Membres présents et qui ne sont pas déjà sélectionnés
-        Membre dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
-        Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
-        Membres dont le nombre de fois fait le groupe de rôle est le plus petit
-        Membres dont le nombre de fois fait le rôle est le plus petit
-    */
+// T1
+/*
+    Membres avec la compétence demandée
+    Membres avec comme compétence principale la compétence demandée et le quota non atteint
+    Membres présents et qui ne sont pas déjà sélectionnés
+    Membres dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
+    Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+    Membres dont le nombre de fois fait le groupe de rôle est le plus petit
+    Membres dont le nombre de fois fait le rôle est le plus petit
+*/
+// T2
+/*
+    Membres avec la compétence demandée
+    Membres présents et qui ne sont pas déjà sélectionnés
+    Membre dont le dernier rôle fait n'est pas celui demandé / Si pas de membres alors ce critère est ignoré
+    Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+    Membres dont le nombre de fois fait le groupe de rôle est le plus petit
+    Membres dont le nombre de fois fait le rôle est le plus petit
+*/

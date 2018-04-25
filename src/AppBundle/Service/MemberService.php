@@ -30,6 +30,45 @@ class MemberService
         return $members;
 	}
 
+    public function getAndCountCinePlay()
+    {
+        $date = $this->serviceDate->getSeasonDate();
+
+        $members = $this->em
+            ->getRepository('AppBundle:Member')
+            ->getTotalCinePlay($date)
+        ;
+
+        return $members;
+    }
+
+    public function getCountCinePlayAndCinePresent()
+    {
+        $cinePresentMembers = $this->getAndCountSchedules();
+        $cinePlayMembers    = $this->getAndCountCinePlay();
+
+        $members = [];
+        foreach ($cinePresentMembers as $key => $cinePresentMember) {
+            $members[$key]['member']           = $cinePresentMember[0];
+            $members[$key]['countCinescenies'] = $cinePresentMember['countCinescenies'];
+
+            $isFind = false;
+            foreach ($cinePlayMembers as $cinePlayMember) {
+                if ($cinePresentMember[0]->getId() == $cinePlayMember['id']) {
+                    $isFind = true;
+                    $members[$key]['counter'] = $cinePlayMember['totalCinePlay'] .'/'. $cinePresentMember['countCinescenies'];
+                    break;
+                }
+            }
+
+            if (!$isFind) {
+                $members[$key]['counter'] = '0/'. $cinePresentMember['countCinescenies'];
+            }
+        }
+
+        return $members;
+    }
+
     // Cette fonction permet d'effacer les rôles d'une cinéscénie et d'enlever les éventuels Laissez passer
     public function cleanSchedules($cinescenie)
     {
@@ -117,6 +156,7 @@ class MemberService
             return $ratioMembers[0];
         }
 
+
         // Membres dont le nombre de fois fait le groupe de rôle est le plus petit
         $groupActMembers = $this->orderByGroupActivities($ratioMembers, $activity, $pastCinescenies);
 
@@ -157,8 +197,10 @@ class MemberService
     // Cette fonction renvoie les membres qui n'ont pas fait le même rôle la dernière fois qu'ils étaient présents
     private function filterByDifferentLastActivity($members, $cinescenie, $date, $activity)
     {
-        $membersSort     = [];
-        $groupActivities = $activity->getGroupActivities();
+        $membersSort         = [];
+        $membersSortGroup    = [];
+        $membersSortActivity = [];
+        $groupActivities     = $activity->getGroupActivities();
         foreach ($members as $member) {
             $schedules = $this
                 ->em
@@ -167,15 +209,26 @@ class MemberService
             ;
 
             if (empty($schedules)) {
-                $membersSort[] = $member;
+                $membersSortGroup[]  = $member;
+                $membersSortActivity = $member;
             } else {
                 $lastActivity = $schedules[0]->getActivity();
                 $lastGroupActivities = $lastActivity->getGroupActivities();
-                    
+                  
                 if ($lastGroupActivities->getId() != $groupActivities->getId()) {
-                    $membersSort[] = $member;
+                    $membersSortGroup[] = $member;
+                }
+
+                if ($lastActivity->getId() != $activity->getId()) {
+                    $membersSortActivity = $member;
                 }
             }
+        }
+
+        $membersSort = $membersSortGroup;
+
+        if (empty($membersSortGroup)) {
+            $membersSort = $membersSortActivity;
         }
 
         return $membersSort;
@@ -280,8 +333,6 @@ class MemberService
     {
         $membersSort = [];
         foreach ($members as $member) {
-            $member = $member[0];
-
             $schedules = $this->em
                 ->getRepository('AppBundle:Schedule')
                 ->getLastSpecialty($member, $date, $cinescenie->getDate())
@@ -322,15 +373,12 @@ class MemberService
     // T2
     /*
         Membres avec la compétence demandée
-        Membres présents et qui ne sont pas déjà sélectionnés
     */
-    public function getForDivisionT2($pastCinescenies, $skills, $activity)
+    public function getForDivisionT2($skills)
     {
-        $groupActivities = $activity->getGroupActivities();
-        $activities = $groupActivities->getActivities();
         $members = $this->em
             ->getRepository('AppBundle:Member')
-            ->getForDivisionT2($pastCinescenies, $skills, $activities)
+            ->getForDivisionT2($skills)
         ;
 
         $resultMembers = [];
@@ -424,14 +472,65 @@ class MemberService
         return $resultActivity;
     }
 
-    public function getForDivisionSpecialty($pastCinescenies, $specialty)
+    // Choix des spécialistes
+    /*
+        Membres avec la spécialité demandée
+    */
+    public function getForDivisionSpecialty($specialty)
     {
         $members = $this
             ->em
             ->getRepository('AppBundle:Member')
-            ->getForDivisionSpecialty($pastCinescenies, $specialty)
+            ->getForDivisionSpecialty($specialty)
         ;
 
-        return $members;
+        $resultMembers = [];
+        foreach ($members as $member) {
+            $resultMembers[] = $member['id'];
+        }
+
+        return $resultMembers;
+    }
+
+    /*
+        Membres présents et qui ne sont pas déjà sélectionnés
+        Membres dont la dernière spécialité faite n'est pas celle demandée / Si pas de membres alors ce critère est ignoré
+        Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+    */
+    public function filterSpecialtyBy($members, $membersSelected, $cinescenie, $date, $specialty)
+    {
+        // Membres présents et qui ne sont pas déjà sélectionnés
+        $presenceMembers = $this->filterByPresence($members, $cinescenie, $membersSelected);
+
+        if (empty($presenceMembers)) {
+            // Pas de membres disponible le rôle sera vide
+            return null;
+        } elseif (count($presenceMembers) == 1) {
+            // Un seul membre disponible le rôle est pour lui
+            return $presenceMembers[0];
+        }
+
+        // Membres dont la dernière spécialité faite n'est pas celle demandée / Si pas de membres alors ce critère est ignoré
+        $diffLastSpeMembers = $this->filterByDifferentLastSpecialty($presenceMembers, $cinescenie, $date, $specialty);
+
+        if (empty($diffLastSpeMembers)) {
+            // Aucun membre n'a de spécialité différente depuis la dernière fois
+            // Ce critère est donc mis de côté et la précédente liste est utilisée
+            $diffLastSpeMembers = $presenceMembers;
+        } elseif (count($diffLastSpeMembers) == 1) {
+            // Un seul membre disponible le rôle est pour lui
+            return $diffLastSpeMembers[0];
+        }
+
+        // Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+        $ratioMembers = $this->orderByRatio($diffLastSpeMembers, $cinescenie, $date); 
+
+        if (count($ratioMembers) == 1) {
+            // Un seul membre disponible le rôle est pour lui
+            return $ratioMembers[0];
+        }
+
+        // Le premier membre est sélectionné
+        return $ratioMembers[0];
     }
 }

@@ -52,7 +52,7 @@
                                         {% else %}
                                             <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
                                         {% endif %}
-                                        {% if schedule.activity %} ({{ schedule.activity.name }} {% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
+                                        {% if schedule.activity %} ({{ schedule.activity.name }}{% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
                                         {% if not loop.last %}, {% endif %}
                                     {% endif %}
                                 {% endfor %}
@@ -79,14 +79,16 @@
                     {% if cinescenie.date|date('ymd') < 'now'|date('ymd') %}
                         <tr>
                             <td>
-                                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
-                                    {{ cinescenie.date|date("d/m/y") }}
-                                </a>
                                 {% if cineComplete[cinescenie.id] %}
                                     <i class="fa fa-check"></i>
                                 {% else %}
                                     <i class="fa fa-times"></i>
                                 {% endif %} 
+                            </td>
+                            <td>
+                                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
+                                    {{ cinescenie.date|date("d/m/y") }}
+                                </a>
                             </td>
                             <td>
                                 {% for schedule in cinescenie.schedules %}
@@ -96,7 +98,7 @@
                                         {% else %}
                                             <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
                                         {% endif %}
-                                        {% if schedule.activity %} ({{ schedule.activity.name }} {% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
+                                        {% if schedule.activity %} ({{ schedule.activity.name }}{% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
                                         {% if not loop.last %}, {% endif %}
                                     {% endif %}
                                 {% endfor %}

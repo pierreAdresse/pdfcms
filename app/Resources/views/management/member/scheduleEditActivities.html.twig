@@ -25,7 +25,13 @@
                 {% for activity in activities %}
                     <tr>
                         <td>
-                            <a href="{{ path('memberScheduleEditActivity', {'cinescenie': cinescenie.id, 'activity': activity.id}) }}">{{ activity.name }}</a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('memberScheduleEditActivity', {'cinescenie': cinescenie.id, 'activity': activity.id}) }}">
+                            {% endif %}
+                                {{ activity.name }}
+                            {% if is_granted('ROLE_ADMIN') %}
+                            </a>
+                            {% endif %}
                         </td>
                         <td>
                             {% for schedule in schedules %}
@@ -56,7 +62,13 @@
                 {% for specialty in specialties %}
                     <tr>
                         <td>
-                            <a href="{{ path('memberScheduleEditSpecialty', {'cinescenie': cinescenie.id, 'specialty': specialty.id}) }}">{{ specialty.name }}</a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                            <a href="{{ path('memberScheduleEditSpecialty', {'cinescenie': cinescenie.id, 'specialty': specialty.id}) }}">
+                            {% endif %}
+                                {{ specialty.name }}
+                            {% if is_granted('ROLE_ADMIN') %}
+                            </a>
+                            {% endif %}
                         </td>
                         <td>
                             {% for schedule in schedules %}

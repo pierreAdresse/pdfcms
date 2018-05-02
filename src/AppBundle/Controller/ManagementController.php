@@ -40,10 +40,10 @@ class ManagementController extends Controller
         $date        = $serviceDate->getSeasonDate();
         $cinescenies = $serviceCinescenie->getCurrents();
 
-        $countActivitiesCines = $this
+        $countActSpeCines = $this
             ->getDoctrine()
             ->getRepository('AppBundle:Cinescenie')
-            ->countActivities($cinescenies)
+            ->countActAndSpe($cinescenies)
         ;
 
         $activities = $this
@@ -54,12 +54,19 @@ class ManagementController extends Controller
             ])
         ;
 
-        $counterActivities = count($activities);
-        $cineComplete      = [];
-        foreach ($countActivitiesCines as $key => $countActivitiesCine) {
-            if ($countActivitiesCine['counter'] < $counterActivities) {
-                $cineComplete[$key]['cinescenie'] = $countActivitiesCine[0];
-                $cineComplete[$key]['manque']     = $counterActivities - $countActivitiesCine['counter'];
+        $specialties = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Specialty')
+            ->findAll()
+        ;
+
+        $counter      = count($activities) + count($specialties);
+        $cineComplete = [];
+        foreach ($countActSpeCines as $key => $countActSpeCine) {
+            $counterCine = $countActSpeCine['counterAct'] + $countActSpeCine['counterSpe'];
+            if ($counterCine < $counter) {
+                $cineComplete[$key]['cinescenie'] = $countActSpeCine[0];
+                $cineComplete[$key]['manque']     = $counter - $counterCine;
             }
         }
 
@@ -82,10 +89,10 @@ class ManagementController extends Controller
         $cinescenies = $serviceCinescenie->getCurrents();
         $today       = new \Datetime('now');
 
-        $countActivitiesCines = $this
+        $countActSpeCines = $this
             ->getDoctrine()
             ->getRepository('AppBundle:Cinescenie')
-            ->countActivities($cinescenies)
+            ->countActAndSpe($cinescenies)
         ;
 
         $activities = $this
@@ -96,14 +103,21 @@ class ManagementController extends Controller
             ])
         ;
 
-        $counterActivities = count($activities);
-        $cineComplete      = [];
-        foreach ($countActivitiesCines as $countActivitiesCine) {
+        $specialties = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Specialty')
+            ->findAll()
+        ;
+
+        $counter      = count($activities) + count($specialties);
+        $cineComplete = [];
+        foreach ($countActSpeCines as $countActSpeCine) {
             $result = false;
-            if ($countActivitiesCine['counter'] == $counterActivities) {
+            $counterCine = $countActSpeCine['counterAct'] + $countActSpeCine['counterSpe'];
+            if ($counterCine == $counter) {
                 $result = true;
             }
-            $cineComplete[$countActivitiesCine[0]->getId()] = $result;
+            $cineComplete[$countActSpeCine[0]->getId()] = $result;
         }
 
         return $this->render('management/member/schedule.html.twig', [
@@ -293,7 +307,7 @@ class ManagementController extends Controller
     }
 
     /**
-     * @Route("/gestion/membres/planning/{cinescenie}/editer-roles/{activity}", name="memberScheduleEditActivity")
+     * @Route("/gestion/membres/planning/{cinescenie}/editer-role/{activity}", name="memberScheduleEditActivity")
      */
     public function scheduleEditActivityRole(Request $request, Cinescenie $cinescenie, Activity $activity)
     {
@@ -352,9 +366,6 @@ class ManagementController extends Controller
             $member = $data['members'];
             $em     = $this->getDoctrine()->getManager();
 
-            $schedule->setActivity(null);
-            $em->persist($schedule);
-
             if (!is_null($member)) {
                 if ($member->getId() != Member::LAISSEZ_PASSER) {
                     $schedule = $this->getDoctrine()
@@ -368,6 +379,8 @@ class ManagementController extends Controller
 
                 $schedule->setMember($member);
                 $schedule->setActivity($activity);
+            } else {
+                $schedule->setActivity(null);
             }
 
             $em->persist($schedule);

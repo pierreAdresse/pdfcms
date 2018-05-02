@@ -209,8 +209,8 @@ class MemberService
             ;
 
             if (empty($schedules)) {
-                $membersSortGroup[]  = $member;
-                $membersSortActivity = $member;
+                $membersSortGroup[]    = $member;
+                $membersSortActivity[] = $member;
             } else {
                 $lastActivity = $schedules[0]->getActivity();
                 $lastGroupActivities = $lastActivity->getGroupActivities();
@@ -220,7 +220,7 @@ class MemberService
                 }
 
                 if ($lastActivity->getId() != $activity->getId()) {
-                    $membersSortActivity = $member;
+                    $membersSortActivity[] = $member;
                 }
             }
         }

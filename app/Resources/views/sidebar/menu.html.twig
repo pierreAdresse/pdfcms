@@ -1,9 +1,9 @@
 {% set menu = {'items':
     [
-        { 'route': 'memberList', 'label': 'Liste des membres', 'role': 'ROLE_ADMIN', 'isActiveFor': ['home', 'memberGeneral', 'memberEditSchedule', 'memberEditSkills'] },
-        { 'route': 'memberSchedule', 'label': 'Planning', 'role': 'ROLE_ADMIN', 'isActiveFor': ['memberScheduleEditActivities', 'memberScheduleEditActivity'] },
+        { 'route': 'memberList', 'label': 'Liste des membres', 'role': 'ROLE_USER', 'isActiveFor': ['home', 'memberGeneral', 'memberEditSchedule', 'memberEditSkills'] },
+        { 'route': 'memberSchedule', 'label': 'Planning', 'role': 'ROLE_USER', 'isActiveFor': ['memberScheduleEditActivities', 'memberScheduleEditActivity'] },
         { 'route': 'memberActivityDivision', 'label': 'Répartition des rôles', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
-        { 'route': 'memberDashboard', 'label': 'Tableau de bord', 'role': 'ROLE_ADMIN', 'isActiveFor': [] },
+        { 'route': 'memberDashboard', 'label': 'Tableau de bord', 'role': 'ROLE_USER', 'isActiveFor': [] },
         { 'route': 'fos_user_security_logout', 'label': 'Se déconnecter', 'role': 'ROLE_USER', 'isActiveFor': [] },
     ]
 } %}

@@ -234,3 +234,9 @@ Equilibrage :
     Membres dont le nombre de fois fait le groupe de rôle est le plus petit
     Membres dont le nombre de fois fait le rôle est le plus petit
 */
+
+----
+
+Constatations :
+- Les rôles sont du plus au moins fait dans l'ordre suivant : neopter, sécurité et visuel. C'est logique car il y a plus de rôles disponibles pour les neopters.
+- Est-ce que la compétence principale est vraiment utile ?! Son utilisation implique des déséquilibres. Il est plus judicieux de jouer avec les compétences.

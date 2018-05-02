@@ -61,15 +61,16 @@ class CinescenieRepository extends \Doctrine\ORM\EntityRepository
         return $cinescenies;
     }
 
-    public function countActivities($cinescenies)
+    public function countActAndSpe($cinescenies)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT c, COUNT(a.id) AS counter
+            SELECT c, COUNT(a.id) AS counterAct, COUNT(s.id) AS counterSpe
             FROM AppBundle:Cinescenie c
             JOIN c.schedules sc
-            JOIN sc.activity a WITH (sc.activity IS NOT NULL)
+            LEFT JOIN sc.activity a WITH (sc.activity IS NOT NULL)
+            LEFT JOIN sc.specialty s WITH (sc.specialty IS NOT NULL)
             WHERE c IN (:cinescenies)
             GROUP BY c.id
             '

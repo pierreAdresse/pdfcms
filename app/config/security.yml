@@ -26,8 +26,12 @@ security:
 
     access_control:
         - { path: ^/identification$, role: IS_AUTHENTICATED_ANONYMOUSLY }
-#        - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
-#        - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_SUPER_ADMIN }
-        - { path: ^/gestion/, role: ROLE_ADMIN }
+#        - { path: ^/gestion/, role: ROLE_ADMIN }
+        - { path: /editer-competences, role: ROLE_ADMIN }
+        - { path: /editer-specialites, role: ROLE_ADMIN }
+        - { path: /editer-planning, role: ROLE_ADMIN }
+        - { path: /editer-role/, role: ROLE_ADMIN }
+        - { path: /editer-specialite/, role: ROLE_ADMIN }
+        - { path: /repartition-roles, role: ROLE_ADMIN }
         - { path: ^/, role: ROLE_USER }

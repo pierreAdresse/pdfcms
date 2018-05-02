@@ -85,17 +85,19 @@
                     </form>
                 </div>
 
-                <div class="row uniform">
-                    <div class="5u 12u$(medium)">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row uniform">
+                        <div class="5u 12u$(medium)">
+                        </div>
+                        <div class="7u 12u$(medium)">
+                            <p>
+                                <a class="button fit" href="{{ path('memberEditSkills', {'member': member.id}) }}">
+                                    Modifier les compétences
+                                </a>
+                            </p>
+                        </div>
                     </div>
-                    <div class="7u 12u$(medium)">
-                        <p>
-                            <a class="button fit" href="{{ path('memberEditSkills', {'member': member.id}) }}">
-                                Modifier les compétences
-                            </a>
-                        </p>
-                    </div>
-                </div>
+                {% endif %}
 
                 <hr>
 
@@ -122,17 +124,19 @@
                     </form>
                 </div>
 
-                <div class="row uniform">
-                    <div class="5u 12u$(medium)">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row uniform">
+                        <div class="5u 12u$(medium)">
+                        </div>
+                        <div class="7u 12u$(medium)">
+                            <p>
+                                <a class="button fit" href="{{ path('memberEditSpecialties', {'member': member.id}) }}">
+                                    Modifier les spécialités
+                                </a>
+                            </p>
+                        </div>
                     </div>
-                    <div class="7u 12u$(medium)">
-                        <p>
-                            <a class="button fit" href="{{ path('memberEditSpecialties', {'member': member.id}) }}">
-                                Modifier les spécialités
-                            </a>
-                        </p>
-                    </div>
-                </div>
+                {% endif %}
             </div>
 
 
@@ -187,17 +191,19 @@
                     </form>
                 </div>
 
-                <div class="row uniform">
-                    <div class="5u 12u$(medium)">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row uniform">
+                        <div class="5u 12u$(medium)">
+                        </div>
+                        <div class="7u 12u$(medium)">
+                            <p>
+                                <a class="button fit" href="{{ path('memberEditSchedule', {'member': member.id}) }}">
+                                    Modifier le planning
+                                </a>
+                            </p>
+                        </div>
                     </div>
-                    <div class="7u 12u$(medium)">
-                        <p>
-                            <a class="button fit" href="{{ path('memberEditSchedule', {'member': member.id}) }}">
-                                Modifier le planning
-                            </a>
-                        </p>
-                    </div>
-                </div>
+                {% endif %}
 
                 <hr>
 

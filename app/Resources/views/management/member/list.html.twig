@@ -64,6 +64,15 @@
               tr[i].style.display = "none";
             }
           }
+
+          td1 = tr[i].getElementsByTagName("td")[1];
+          if (td1) {
+            if (td1.innerHTML.toUpperCase().indexOf(filter) > -1) {
+              tr[i].style.display = "";
+            } else {
+              tr[i].style.display = "none";
+            }
+          }
         }
       }
 

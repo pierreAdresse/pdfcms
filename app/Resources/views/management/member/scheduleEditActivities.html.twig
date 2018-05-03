@@ -18,7 +18,7 @@
             <thead>
                 <tr>
                     <th>Rôle</th>
-                    <th>Utilisateur</th>
+                    <th>Membre</th>
                 </tr>
             </thead>
             <tbody>
@@ -55,7 +55,7 @@
             <thead>
                 <tr>
                     <th>Spécialité</th>
-                    <th>Utilisateur</th>
+                    <th>Membre</th>
                 </tr>
             </thead>
             <tbody>
@@ -89,7 +89,7 @@
         </table>
 
         <p>
-            Personnes présentes sans rôle d'attribué :
+            Membres présents sans rôle d'attribué :
             {% for schedule in schedules %}
                 {% if schedule.member %}
                     {% if schedule.activity is null %}

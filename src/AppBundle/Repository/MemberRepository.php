@@ -89,20 +89,24 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
 
     public function getForActivityWithoutSkill($cinescenie, $members)
     {
+        $where  = '';
+        $params = ['cinescenie' => $cinescenie];
+        if (!empty($members)) {
+            $where = 'AND m NOT IN (:members)';
+            $params['members'] = $members;
+        }
+
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
             SELECT m
             FROM AppBundle:Member m
             JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie and sc.activity is null)
-            WHERE m NOT IN (:members)
-            AND m.deleted = 0
+            WHERE m.deleted = 0
+            '.$where.'
             ORDER BY m.firstname ASC
             '
-        )->setParameters([
-            'cinescenie' => $cinescenie,
-            'members'    => $members,
-        ]);
+        )->setParameters($params);
         $members = $query->getResult();
 
         return $members;
@@ -259,31 +263,6 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
 
         return $members; 
     }
-
-/*
-    public function getForDivisionT2($pastCinescenies, $skills, $activities)
-    {
-        $em = $this->getEntityManager();
-        $query = $em->createQuery(
-            '
-            SELECT m.id, COUNT(sc.id) AS gaNumOfTim
-            FROM AppBundle:Member m
-            JOIN m.memberSkills ms WITH ms.skill IN (:skills)
-            LEFT JOIN m.schedules sc WITH (sc.activity IN (:activities) AND sc.cinescenie IN (:pastCinescenies))
-            WHERE m.deleted = 0
-            GROUP BY m.id
-            ORDER BY gaNumOfTim ASC
-            '
-        )->setParameters([
-            'skills'          => $skills,
-            'activities'      => $activities,
-            'pastCinescenies' => $pastCinescenies,
-        ]);
-        $members = $query->getResult();
-
-        return $members; 
-    }
-*/
 
     public function getWithSpecialty($cinescenie, $specialty)
     {

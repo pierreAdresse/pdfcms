@@ -368,6 +368,9 @@ class ManagementController extends Controller
 
             if (!is_null($member)) {
                 if ($member->getId() != Member::LAISSEZ_PASSER) {
+                    $schedule->setActivity(null);
+                    $em->persist($schedule);
+
                     $schedule = $this->getDoctrine()
                         ->getRepository('AppBundle:Schedule')
                         ->findOneBy([

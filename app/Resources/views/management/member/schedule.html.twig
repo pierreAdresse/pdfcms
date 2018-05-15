@@ -40,7 +40,7 @@
                                 {% endif %} 
 
                                 {% if cinescenie.isTraining %}
-                                    <b>R</b>
+                                    <b title="Répétition">R</b>
                                 {% endif %}
                             </td>
                             <td>
@@ -89,12 +89,18 @@
                                     <i class="fa fa-check"></i>
                                 {% else %}
                                     <i class="fa fa-times"></i>
-                                {% endif %} 
+                                {% endif %}
+
+                                {% if cinescenie.isTraining %}
+                                    <b title="Répétition">R</b>
+                                {% endif %}
                             </td>
                             <td>
                                 <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
                                     {{ cinescenie.date|date("d/m/y") }}
                                 </a>
+                                <br/>
+                                {{ cinescenie.date|date("H:i") }}
                             </td>
                             <td>
                                 {% for schedule in cinescenie.schedules %}

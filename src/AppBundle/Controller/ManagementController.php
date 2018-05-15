@@ -822,6 +822,8 @@ class ManagementController extends Controller
         $year        = $serviceDate->getSeasonYear();
         $date        = $serviceDate->getSeasonDate();
 
+        $cinesceniesWithoutTraining = $serviceCinescenie->getCurrentsWithoutTraining();
+
         $skills = $this->getDoctrine()
             ->getRepository('AppBundle:Skill')
             ->findAll()
@@ -847,7 +849,7 @@ class ManagementController extends Controller
             ->findBy([
                 'member'     => $member,
                 'activity'   => null,
-                'cinescenie' => $cinescenies,
+                'cinescenie' => $cinesceniesWithoutTraining,
             ])
         ;
 
@@ -857,16 +859,12 @@ class ManagementController extends Controller
             ->getRepository('AppBundle:Schedule')
             ->findBy([
                 'member'     => $member,
-                'cinescenie' => $cinescenies,
+                'cinescenie' => $cinesceniesWithoutTraining,
             ])
         ;
 
-        $numberPresenceWithActivity = count($schedules) - $numberPresenceWithoutActivity;
-
-        $countCinescenies = $this->getDoctrine()
-            ->getRepository('AppBundle:Member')
-            ->getAndCountSchedulesForMember($date, $member)
-        ;
+        $numberPresence             = count($schedules);
+        $numberPresenceWithActivity = $numberPresence - $numberPresenceWithoutActivity;
 
         $stats[] = [
             'name'          => 'Suppléant',
@@ -885,9 +883,9 @@ class ManagementController extends Controller
             'cinescenies'                => $cinescenies,
             'year'                       => $year,
             'stats'                      => $stats,
-            'count'                      => $countCinescenies[0],
             'gaStats'                    => $gaStats,
             'numberPresenceWithActivity' => $numberPresenceWithActivity,
+            'numberPresence'             => $numberPresence,
         ]);
     }
 

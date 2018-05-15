@@ -12,7 +12,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
             SELECT m, COUNT(c.id) AS countCinescenies
             FROM AppBundle:Member m
             LEFT JOIN m.schedules sc
-            LEFT JOIN sc.cinescenie c WITH c.date > :date
+            LEFT JOIN sc.cinescenie c WITH (c.date > :date AND c.isTraining = 0)
             WHERE m.deleted = 0
             GROUP BY m.id
             ORDER BY m.firstname ASC
@@ -32,34 +32,13 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
             SELECT m.id, COUNT(sc.id) AS totalCinePlay
             FROM AppBundle:Member m
             JOIN m.schedules sc WITH (sc.activity IS NOT NULL)
-            JOIN sc.cinescenie c WITH (c.date > :date)
+            JOIN sc.cinescenie c WITH (c.date > :date AND c.isTraining = 0)
             WHERE m.deleted = 0
             GROUP BY m.id
             ORDER BY totalCinePlay ASC
             '
         )->setParameters([
             'date' => $date,
-        ]);
-        $members = $query->getResult();
-
-        return $members;
-    }
-
-    public function getAndCountSchedulesForMember($date, $member)
-    {
-        $em = $this->getEntityManager();
-        $query = $em->createQuery(
-            '
-            SELECT COUNT(c.id) AS countCinescenies
-            FROM AppBundle:Member m
-            LEFT JOIN m.schedules sc
-            LEFT JOIN sc.cinescenie c WITH c.date > :date
-            WHERE m = :member
-            GROUP BY m.id
-            '
-        )->setParameters([
-            'date'   => $date,
-            'member' => $member,
         ]);
         $members = $query->getResult();
 

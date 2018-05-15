@@ -35,6 +35,18 @@ class Cinescenie
         return $cinescenies;
 	}
 
+    public function getCurrentsWithoutTraining()
+    {
+        $date = $this->serviceDate->getSeasonDate();
+
+        $cinescenies = $this->em
+            ->getRepository('AppBundle:Cinescenie')
+            ->getByDateGreaterThanWithoutTraining($date)
+        ;
+
+        return $cinescenies;
+    }
+
     public function getCurrentsByMember($member)
     {
         $date = $this->serviceDate->getSeasonDate();

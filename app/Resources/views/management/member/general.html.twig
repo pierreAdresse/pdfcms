@@ -143,10 +143,10 @@
             <div class="6u 12u$(xsmall)">
                 <h3>Planning {{ year }}</h3>
 
-                {% if count.countCinescenies < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
+                {% if numberPresence < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
 		            <div class="box">
 		                <p>
-		                	<i class="fa fa-exclamation"></i> Attention : {{ member.firstname }} ne respecte pas les 15 séances minimum de présence. Actuellement {{ member.schedules|length }} présence(s).
+		                	<i class="fa fa-exclamation"></i> Attention : {{ member.firstname }} ne respecte pas les 15 séances minimum de présence. Actuellement {{ numberPresence }} présence(s).
 		                </p>
 		            </div>
 		        {% endif %}
@@ -177,7 +177,7 @@
                                     <tr>
                                         <td>
                                             <input type="checkbox"{% if presence %} checked{% endif %}>
-                                            <label class="without-margin">{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y')|capitalize }}</label>
+                                            <label class="without-margin">{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y à HH:mm')|capitalize }}{% if cinescenie.isTraining %} <b>R</b>{% endif %}</label>
                                         </td>
                                         <td>
                                             {% if activityName %}
@@ -210,19 +210,17 @@
                 <h3>Statistiques par rôle</h3>
 
                 <p>
-                    Nombre total de présences dans la saison : {{ member.schedules|length }}
+                    Nombre total de présences dans la saison : {{ numberPresence }}
                     <br/>
                     Nombre total de présences avec activité dans la saison : {{ numberPresenceWithActivity }}
                 </p>
-
-                {% set totalPresences = member.schedules|length %}
 
                 <div class="table-wrapper">
                     <table>
                         <tbody>
                             {% for stat in stats %}
-                                {% if totalPresences > 0 %}
-                                    {% set pourcentage = stat.numberOfTimes / totalPresences * 100 %}
+                                {% if numberPresence > 0 %}
+                                    {% set pourcentage = stat.numberOfTimes / numberPresence * 100 %}
                                 {% else %}
                                     {% set pourcentage = 0 %}
                                 {% endif %}
@@ -242,8 +240,8 @@
                     <table>
                         <tbody>
                             {% for gaStat in gaStats %}
-                                {% if totalPresences > 0 %}
-                                    {% set pourcentage = gaStat.numberOfTimes / totalPresences * 100 %}
+                                {% if numberPresence > 0 %}
+                                    {% set pourcentage = gaStat.numberOfTimes / numberPresence * 100 %}
                                 {% else %}
                                     {% set pourcentage = 0 %}
                                 {% endif %}

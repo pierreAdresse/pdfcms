@@ -37,6 +37,13 @@ class Cinescenie
     private $date;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_training", type="boolean")
+     */
+    private $isTraining;
+
+    /**
      * @ORM\OneToMany(targetEntity="Schedule", mappedBy="cinescenie")
      */
     private $schedules;
@@ -111,5 +118,29 @@ class Cinescenie
     public function getSchedules()
     {
         return $this->schedules;
+    }
+
+    /**
+     * Set isTraining
+     *
+     * @param boolean $isTraining
+     *
+     * @return Cinescenie
+     */
+    public function setIsTraining($isTraining)
+    {
+        $this->isTraining = $isTraining;
+
+        return $this;
+    }
+
+    /**
+     * Get isTraining
+     *
+     * @return boolean
+     */
+    public function getIsTraining()
+    {
+        return $this->isTraining;
     }
 }

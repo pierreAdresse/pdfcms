@@ -271,7 +271,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
             '
             SELECT m
             FROM AppBundle:Member m
-            JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie)
+            JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie and sc.specialty is null)
             JOIN m.memberSpecialties ms WITH (ms.specialty = :specialty)
             WHERE m.deleted = 0
             ORDER BY m.firstname ASC
@@ -300,6 +300,44 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
         )->setParameters([
             'cinescenie' => $cinescenie,
             'members'    => $members,
+        ]);
+        $members = $query->getResult();
+
+        return $members;
+    }
+
+    public function getSelected($cinescenie, $activity)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT m
+            FROM AppBundle:Member m
+            JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie AND sc.activity = :activity)
+            ORDER BY m.firstname ASC
+            '
+        )->setParameters([
+            'cinescenie' => $cinescenie,
+            'activity'   => $activity,
+        ]);
+        $members = $query->getResult();
+
+        return $members;
+    }
+
+    public function getSelectedSpecialty($cinescenie, $specialty)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT m
+            FROM AppBundle:Member m
+            JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie AND sc.specialty = :specialty)
+            ORDER BY m.firstname ASC
+            '
+        )->setParameters([
+            'cinescenie' => $cinescenie,
+            'specialty'  => $specialty,
         ]);
         $members = $query->getResult();
 

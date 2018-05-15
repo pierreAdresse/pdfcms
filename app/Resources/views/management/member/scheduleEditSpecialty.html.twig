@@ -6,7 +6,38 @@
             <h2>Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y') }}</h2>
         </header>
 
-        <h3>Choix de la personne pour le rôle : {{ specialty.name }}</h3>
+        {% for flash_message in app.session.flashBag.get('notice') %}
+          <div class="box">
+              <p>{{ flash_message }}</p>
+          </div>
+        {% endfor %}
+
+        <h3>Membre(s) affecté(s) au rôle : {{ specialty.name }}</h3>
+
+        <table class="min">
+            <thead>
+                <tr>
+                    <th>Membre</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in membersSelected %}
+                    <tr>
+                        <td>
+                            {{ member.firstName }} {{ member.lastName }}
+                        </td>
+                        <td>
+                            <a href="{{ path('memberScheduleEditSpecialtyDeleteMember', {'cinescenie': cinescenie.id, 'specialty': specialty.id, 'member': member.id}) }}" class="button special">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h3>Ajout d'un membre</h3>
         
         {{ form_start(form) }}
             <div class="row uniform">
@@ -21,7 +52,7 @@
                 <div class="12u$">
                     <ul class="actions align-right">
                         <li><a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}" class="button">Retour</a></li>
-                        <li><input type="submit" value="Enregistrer" class="special" /></li>
+                        <li><input type="submit" value="Ajouter" class="special" /></li>
                     </ul>
                 </div>
             </div>

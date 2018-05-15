@@ -40,12 +40,6 @@ class ManagementController extends Controller
         $date        = $serviceDate->getSeasonDate();
         $cinescenies = $serviceCinescenie->getCurrents();
 
-        $countActSpeCines = $this
-            ->getDoctrine()
-            ->getRepository('AppBundle:Cinescenie')
-            ->countActAndSpe($cinescenies)
-        ;
-
         $activities = $this
             ->getDoctrine()
             ->getRepository('AppBundle:Activity')
@@ -60,13 +54,30 @@ class ManagementController extends Controller
             ->findAll()
         ;
 
-        $counter      = count($activities) + count($specialties);
         $cineComplete = [];
-        foreach ($countActSpeCines as $key => $countActSpeCine) {
-            $counterCine = $countActSpeCine['counterAct'] + $countActSpeCine['counterSpe'];
-            if ($counterCine < $counter) {
-                $cineComplete[$key]['cinescenie'] = $countActSpeCine[0];
-                $cineComplete[$key]['manque']     = $counter - $counterCine;
+        $counter      = count($activities) + count($specialties);
+        foreach ($cinescenies as $key => $cinescenie) {
+            $activitiesId  = [];
+            $specialtiesId = [];
+            $schedules    = $cinescenie->getSchedules();
+            foreach ($schedules as $schedule) {
+                $activity  = $schedule->getActivity();
+                $specialty = $schedule->getSpecialty();
+
+                if (!is_null($activity) && !in_array($activity->getId(), $activitiesId)) {
+                    $activitiesId[]  = $activity->getId();
+                }
+
+                if (!is_null($specialty) && !in_array($specialty->getId(), $specialtiesId)) {
+                    $specialtiesId[] = $specialty->getId();
+                }
+            }
+            
+            $counterActSpe = count($activitiesId) + count($specialtiesId);
+
+            if ($counter != $counterActSpe) {
+                $cineComplete[$key]['cinescenie'] = $cinescenie;
+                $cineComplete[$key]['manque']     = $counter - $counterActSpe;
             }
         }
 
@@ -89,12 +100,6 @@ class ManagementController extends Controller
         $cinescenies = $serviceCinescenie->getCurrents();
         $today       = new \Datetime('now');
 
-        $countActSpeCines = $this
-            ->getDoctrine()
-            ->getRepository('AppBundle:Cinescenie')
-            ->countActAndSpe($cinescenies)
-        ;
-
         $activities = $this
             ->getDoctrine()
             ->getRepository('AppBundle:Activity')
@@ -109,15 +114,31 @@ class ManagementController extends Controller
             ->findAll()
         ;
 
-        $counter      = count($activities) + count($specialties);
         $cineComplete = [];
-        foreach ($countActSpeCines as $countActSpeCine) {
+        $counter      = count($activities) + count($specialties);
+        foreach ($cinescenies as $cinescenie) {
+            $activitiesId  = [];
+            $specialtiesId = [];
+            $schedules    = $cinescenie->getSchedules();
+            foreach ($schedules as $schedule) {
+                $activity  = $schedule->getActivity();
+                $specialty = $schedule->getSpecialty();
+
+                if (!is_null($activity) && !in_array($activity->getId(), $activitiesId)) {
+                    $activitiesId[]  = $activity->getId();
+                }
+
+                if (!is_null($specialty) && !in_array($specialty->getId(), $specialtiesId)) {
+                    $specialtiesId[] = $specialty->getId();
+                }
+            }
+            
+            $counterActSpe = count($activitiesId) + count($specialtiesId);
             $result = false;
-            $counterCine = $countActSpeCine['counterAct'] + $countActSpeCine['counterSpe'];
-            if ($counterCine == $counter) {
+            if ($counterActSpe == $counter) {
                 $result = true;
             }
-            $cineComplete[$countActSpeCine[0]->getId()] = $result;
+            $cineComplete[$cinescenie->getId()] = $result;
         }
 
         return $this->render('management/member/schedule.html.twig', [
@@ -309,7 +330,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/planning/{cinescenie}/editer-role/{activity}", name="memberScheduleEditActivity")
      */
-    public function scheduleEditActivityRole(Request $request, Cinescenie $cinescenie, Activity $activity)
+    public function scheduleEditActivity(Request $request, Cinescenie $cinescenie, Activity $activity)
     {
         $skillActivity = $this->getDoctrine()
             ->getRepository('AppBundle:SkillActivity')
@@ -329,32 +350,38 @@ class ManagementController extends Controller
             ->getForActivityWithoutSkill($cinescenie, $members)
         ;
 
+        $hasLaissezPasser = false;
+        foreach ($secondaryMembers as $secondaryMember) {
+            if ($secondaryMember->getId() == Member::LAISSEZ_PASSER) {
+                $hasLaissezPasser = true;
+                break;
+            }
+        }
+
         $memberLaissezPasser = $this->getDoctrine()
             ->getRepository('AppBundle:Member')
             ->find(Member::LAISSEZ_PASSER)
         ;
-        $secondaryMembers[] = $memberLaissezPasser;
 
-        $schedule = $this->getDoctrine()
+        $scheduleLp = $this->getDoctrine()
             ->getRepository('AppBundle:Schedule')
             ->findOneBy([
                 'cinescenie' => $cinescenie,
+                'member'     => $memberLaissezPasser,
                 'activity'   => $activity,
             ])
         ;
 
-        $memberSelected = null;
-        if (!is_null($schedule)) {
-            $memberSelected = $schedule->getMember();
-            $members[] = $memberSelected;
-        } else {
-            $schedule = new Schedule();
-            $schedule->setCinescenie($cinescenie);
-            $schedule->setActivity($activity);
+        if (!$hasLaissezPasser && is_null($scheduleLp)) {
+            $secondaryMembers[] = $memberLaissezPasser;
         }
 
+        $membersSelected = $this->getDoctrine()
+            ->getRepository('AppBundle:Member')
+            ->getSelected($cinescenie, $activity)
+        ;
+
         $form = $this->createForm(ChoiceMemberForActivityType::class, $members, [
-            'memberSelected'   => $memberSelected,
             'secondaryMembers' => $secondaryMembers,
             'activityName'     => $activity->getName(),
         ]);
@@ -368,9 +395,6 @@ class ManagementController extends Controller
 
             if (!is_null($member)) {
                 if ($member->getId() != Member::LAISSEZ_PASSER) {
-                    $schedule->setActivity(null);
-                    $em->persist($schedule);
-
                     $schedule = $this->getDoctrine()
                         ->getRepository('AppBundle:Schedule')
                         ->findOneBy([
@@ -378,29 +402,75 @@ class ManagementController extends Controller
                             'member'     => $member,
                         ])
                     ;
+                } else {
+                    $schedule = new Schedule();
+                    $schedule->setCinescenie($cinescenie);
                 }
 
                 $schedule->setMember($member);
                 $schedule->setActivity($activity);
-            } else {
-                $schedule->setActivity(null);
+                $em->persist($schedule);
+                $em->flush();
+
+                $this->addFlash(
+                    'notice',
+                    $member->getFirstname().' '.$member->getLastname().' est ajouté(e) au rôle !'
+                );
             }
 
-            $em->persist($schedule);
-            $em->flush();
-
-            $this->addFlash(
-                'notice',
-                'Les données sont bien enregistrées !'
-            );
-
-            return $this->redirectToRoute('memberScheduleEditActivities', ['cinescenie' => $cinescenie->getId()]);
+            return $this->redirectToRoute('memberScheduleEditActivity', [
+                'cinescenie' => $cinescenie->getId(),
+                'activity'   => $activity->getId(),
+            ]);
         }
 
         return $this->render('management/member/scheduleEditActivity.html.twig', [
-            'activity'   => $activity,
-            'cinescenie' => $cinescenie,
-            'form'       => $form->createView(),
+            'activity'        => $activity,
+            'cinescenie'      => $cinescenie,
+            'form'            => $form->createView(),
+            'membersSelected' => $membersSelected,
+        ]);
+    }
+
+    /**
+     * @Route("/gestion/membres/planning/{cinescenie}/editer-role/{activity}/supprimer-membre/{member}", name="memberScheduleEditActivityDeleteMember")
+     */
+    public function scheduleEditActivityDeleteMember(Request $request, Cinescenie $cinescenie, Activity $activity, Member $member)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ($member->getId() == Member::LAISSEZ_PASSER) {
+            $schedule = $this->getDoctrine()
+                ->getRepository('AppBundle:Schedule')
+                ->findOneBy([
+                    'cinescenie' => $cinescenie,
+                    'member'     => $member,
+                    'activity'   => $activity,
+                ])
+            ;
+            $em->remove($schedule);
+        } else {
+            $schedule = $this->getDoctrine()
+                ->getRepository('AppBundle:Schedule')
+                ->findOneBy([
+                    'cinescenie' => $cinescenie,
+                    'member'     => $member,
+                ])
+            ;
+            $schedule->setActivity(null);
+            $em->persist($schedule);
+        }
+
+        $em->flush();
+
+        $this->addFlash(
+            'notice',
+            $member->getFirstname().' '.$member->getLastname().' est supprimé(e) du rôle !'
+        );
+
+        return $this->redirectToRoute('memberScheduleEditActivity', [
+            'cinescenie' => $cinescenie->getId(),
+            'activity'   => $activity->getId(),
         ]);
     }
 
@@ -427,32 +497,38 @@ class ManagementController extends Controller
             ->getWithoutSpecialty($cinescenie, $members)
         ;
 
+        $hasLaissezPasser = false;
+        foreach ($secondaryMembers as $secondaryMember) {
+            if ($secondaryMember->getId() == Member::LAISSEZ_PASSER) {
+                $hasLaissezPasser = true;
+                break;
+            }
+        }
+
         $memberLaissezPasser = $this->getDoctrine()
             ->getRepository('AppBundle:Member')
             ->find(Member::LAISSEZ_PASSER)
         ;
-        $secondaryMembers[] = $memberLaissezPasser;
 
-        $schedule = $this->getDoctrine()
+        $scheduleLp = $this->getDoctrine()
             ->getRepository('AppBundle:Schedule')
             ->findOneBy([
                 'cinescenie' => $cinescenie,
+                'member'     => $memberLaissezPasser,
                 'specialty'  => $specialty,
             ])
         ;
 
-        $memberSelected = null;
-        if (!is_null($schedule)) {
-            $memberSelected = $schedule->getMember();
-            $members[] = $memberSelected;
-        } else {
-            $schedule = new Schedule();
-            $schedule->setCinescenie($cinescenie);
-            $schedule->setSpecialty($specialty);
+        if (!$hasLaissezPasser && is_null($scheduleLp)) {
+            $secondaryMembers[] = $memberLaissezPasser;
         }
 
+        $membersSelected = $this->getDoctrine()
+            ->getRepository('AppBundle:Member')
+            ->getSelectedSpecialty($cinescenie, $specialty)
+        ;
+
         $form = $this->createForm(ChoiceMemberForSpecialtyType::class, $members, [
-            'memberSelected'   => $memberSelected,
             'secondaryMembers' => $secondaryMembers,
             'specialtyName'    => $specialty->getName(),
         ]);
@@ -464,9 +540,6 @@ class ManagementController extends Controller
             $member = $data['members'];
             $em     = $this->getDoctrine()->getManager();
 
-            $schedule->setSpecialty(null);
-            $em->persist($schedule);
-
             if (!is_null($member)) {
                 if ($member->getId() != Member::LAISSEZ_PASSER) {
                     $schedule = $this->getDoctrine()
@@ -476,27 +549,75 @@ class ManagementController extends Controller
                             'member'     => $member,
                         ])
                     ;
+                } else {
+                    $schedule = new Schedule();
+                    $schedule->setCinescenie($cinescenie);
                 }
 
                 $schedule->setMember($member);
                 $schedule->setSpecialty($specialty);
+                $em->persist($schedule);
+                $em->flush();
+
+                $this->addFlash(
+                    'notice',
+                    $member->getFirstname().' '.$member->getLastname().' est ajouté(e) à la spécialité !'
+                );
             }
 
-            $em->persist($schedule);
-            $em->flush();
-
-            $this->addFlash(
-                'notice',
-                'Les données sont bien enregistrées !'
-            );
-
-            return $this->redirectToRoute('memberScheduleEditActivities', ['cinescenie' => $cinescenie->getId()]);
+            return $this->redirectToRoute('memberScheduleEditSpecialty', [
+                'cinescenie' => $cinescenie->getId(),
+                'specialty'  => $specialty->getId(),
+            ]);
         }
 
         return $this->render('management/member/scheduleEditSpecialty.html.twig', [
-            'specialty'  => $specialty,
-            'cinescenie' => $cinescenie,
-            'form'       => $form->createView(),
+            'specialty'       => $specialty,
+            'cinescenie'      => $cinescenie,
+            'form'            => $form->createView(),
+            'membersSelected' => $membersSelected,
+        ]);
+    }
+
+    /**
+     * @Route("/gestion/membres/planning/{cinescenie}/editer-specialite/{specialty}/supprimer-membre/{member}", name="memberScheduleEditSpecialtyDeleteMember")
+     */
+    public function scheduleEditSpecialtyDeleteMember(Request $request, Cinescenie $cinescenie, Specialty $specialty, Member $member)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ($member->getId() == Member::LAISSEZ_PASSER) {
+            $schedule = $this->getDoctrine()
+                ->getRepository('AppBundle:Schedule')
+                ->findOneBy([
+                    'cinescenie' => $cinescenie,
+                    'member'     => $member,
+                    'specialty'  => $specialty,
+                ])
+            ;
+            $em->remove($schedule);
+        } else {
+            $schedule = $this->getDoctrine()
+                ->getRepository('AppBundle:Schedule')
+                ->findOneBy([
+                    'cinescenie' => $cinescenie,
+                    'member'     => $member,
+                ])
+            ;
+            $schedule->setSpecialty(null);
+            $em->persist($schedule);
+        }
+
+        $em->flush();
+
+        $this->addFlash(
+            'notice',
+            $member->getFirstname().' '.$member->getLastname().' est supprimé(e) de la spécialité !'
+        );
+
+        return $this->redirectToRoute('memberScheduleEditSpecialty', [
+            'cinescenie' => $cinescenie->getId(),
+            'specialty'  => $specialty->getId(),
         ]);
     }
 

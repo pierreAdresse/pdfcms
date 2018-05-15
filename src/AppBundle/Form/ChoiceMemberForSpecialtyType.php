@@ -26,7 +26,7 @@ class ChoiceMemberForSpecialtyType extends AbstractType
                         return $member->getFirstname().' '.$member->getLastname();
                     }
                 },
-                'data' => $options['memberSelected'],
+                'data' => null,
                 'empty_data' => null,
                 'required' => false,
             ]
@@ -36,7 +36,6 @@ class ChoiceMemberForSpecialtyType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'memberSelected'   => null,
             'secondaryMembers' => [],
             'specialtyName'    => '',
         ]);

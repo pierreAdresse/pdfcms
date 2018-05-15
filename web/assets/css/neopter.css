@@ -25,3 +25,11 @@ table.compact thead tr th:nth-child(2) {
 table.compact tbody tr td:nth-child(2) {
 	width: 1%;
 }
+
+table.min thead tr th:nth-child(2) {
+	width: 1%;
+}
+
+table.min tbody tr td:nth-child(2) {
+	width: 1%;
+}

@@ -42,6 +42,7 @@
                                         {% else %}
                                             <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> {% if schedule.specialty %}({{ schedule.specialty.name }}){% endif %}
                                         {% endif %}
+                                        |
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
@@ -79,6 +80,7 @@
                                         {% else %}
                                             <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a>
                                         {% endif %}
+                                        |
                                     {% endif %}
                                 {% endif %}
                             {% endfor %}
@@ -100,13 +102,5 @@
                 {% endif %}
             {% endfor %}
         </p>
-
-        <div class="row uniform">
-            <div class="12u$">
-                <ul class="actions align-right">
-                    <li><a href="{{ path('memberSchedule') }}" class="button">Retour</a></li>
-                </ul>
-            </div>
-        </div>
     </section>
 {% endblock %}

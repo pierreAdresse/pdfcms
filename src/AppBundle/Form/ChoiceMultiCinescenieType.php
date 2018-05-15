@@ -22,7 +22,8 @@ class ChoiceMultiCinescenieType extends AbstractType
                         \IntlDateFormatter::FULL,
                         \IntlDateFormatter::NONE,
                         'Europe/Paris',
-                        \IntlDateFormatter::GREGORIAN
+                        \IntlDateFormatter::GREGORIAN,
+                        'EEEE d MMMM yyyy à HH:mm'
                     );
 
                     return ucfirst($formatter->format($cinescenie->getDate()));

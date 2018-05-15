@@ -41,7 +41,7 @@
                             </td>
                             <td>
                                 <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
-                                    {{ cinescenie.date|date("d/m/y") }}
+                                    {{ cinescenie.date|date("d/m/y") }}<br/>{{ cinescenie.date|date("H:i") }}
                                 </a>
                             </td>
                             <td>

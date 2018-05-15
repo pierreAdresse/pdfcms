@@ -67,6 +67,13 @@ class Activity
     private $ranking;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="order_display", type="integer", unique=false)
+     */
+    private $orderDisplay;
+
+    /**
      * @var bool
      *
      * @ORM\Column(name="allowForDivision", type="boolean")
@@ -284,5 +291,29 @@ class Activity
     public function getSpecialtyActivities()
     {
         return $this->specialtyActivities;
+    }
+
+    /**
+     * Set orderDisplay
+     *
+     * @param integer $orderDisplay
+     *
+     * @return Activity
+     */
+    public function setOrderDisplay($orderDisplay)
+    {
+        $this->orderDisplay = $orderDisplay;
+
+        return $this;
+    }
+
+    /**
+     * Get orderDisplay
+     *
+     * @return integer
+     */
+    public function getOrderDisplay()
+    {
+        return $this->orderDisplay;
     }
 }

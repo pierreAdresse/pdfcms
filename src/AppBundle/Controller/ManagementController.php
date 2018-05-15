@@ -304,7 +304,7 @@ class ManagementController extends Controller
             ->getRepository('AppBundle:Activity')
             ->findBy([
                 'allowForDivision' => true,
-            ], ['ranking' => 'ASC'])
+            ], ['orderDisplay' => 'ASC'])
         ;
 
         $specialties = $this->getDoctrine()

@@ -25,9 +25,92 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use AppBundle\Service\Cinescenie as CinescenieService;
 use AppBundle\Service\Date;
 use AppBundle\Service\MemberService;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ManagementController extends Controller
 {
+
+    /**
+     * @Route("/gestion/membres/planning/{cinescenie}/excel", name="memberScheduleExcel")
+     */
+    public function scheduleExcelAction(Request $request, Cinescenie $cinescenie)
+    {
+        $activities = $this->getDoctrine()
+            ->getRepository('AppBundle:Activity')
+            ->findBy([
+                'allowForDivision' => true,
+            ], ['orderDisplay' => 'ASC'])
+        ;
+
+        $specialties = $this->getDoctrine()
+            ->getRepository('AppBundle:Specialty')
+            ->findAll()
+        ;
+
+        $schedules = $this->getDoctrine()
+            ->getRepository('AppBundle:Schedule')
+            ->findBy([
+                'cinescenie' => $cinescenie,
+            ])
+        ;
+
+        $spreadsheet = $this->get('phpoffice.spreadsheet')->createSpreadsheet();
+
+        $cellY = 1;
+        foreach ($activities as $activity) {
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $activity->getName());
+
+            $members = '';
+            foreach ($schedules as $schedule) {
+                $member           = $schedule->getMember();
+                $activitySchedule = $schedule->getActivity();
+
+                if (!is_null($member) && !is_null($activitySchedule) && $activitySchedule->getId() == $activity->getId()) {
+                    $specialty = $schedule->getSpecialty();
+                    
+                    $spe = '';
+                    if (!is_null($specialty)) {
+                        $spe = ' ('.$specialty->getName().')';
+                    }
+                    
+                    $members .= $member->getFirstname().' '.$member->getLastname().$spe.', ';
+                }
+            }
+            $members = substr($members, 0, -2);
+
+            $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
+            $cellY++;
+        }
+
+        $cellY++;
+        $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, 'Membres présents sans rôle');
+
+        foreach ($schedules as $schedule) {
+            $member = $schedule->getMember();
+
+            if (!is_null($member) && is_null($activitySchedule)) {
+                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $member->getFirstname().' '.$member->getLastname());
+                $cellY++;
+            }
+        }
+
+        $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
+        $writerXlsx->save('planning.xlsx');
+
+        /*
+        $readerXlsx  = $this->get('phpoffice.spreadsheet')->createReader('Xlsx');
+        $spreadsheet = $readerXlsx->load('destination.xlsx');
+
+        $spreadsheet->getActiveSheet()->setCellValue('B3', 'Test réussi !');
+
+        $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
+        $writerXlsx->save('destination.xlsx');
+        */
+
+        return new BinaryFileResponse('planning.xlsx');
+        //return $this->render('management/member/excel.html.twig');
+    }
+
     /**
      * @Route("/gestion/membres/tableau-de-bord", name="memberDashboard")
      */

@@ -56,6 +56,7 @@ class ManagementController extends Controller
 
         $spreadsheet = $this->get('phpoffice.spreadsheet')->createSpreadsheet();
 
+        // Rôles
         $cellY = 1;
         foreach ($activities as $activity) {
             $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $activity->getName());
@@ -76,12 +77,39 @@ class ManagementController extends Controller
                     $members .= $member->getFirstname().' '.$member->getLastname().$spe.', ';
                 }
             }
-            $members = substr($members, 0, -2);
 
-            $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
+            if (!empty($members)) {
+                $members = substr($members, 0, -2);
+                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
+            }
+
             $cellY++;
         }
 
+        // Spécialités
+        $cellY++;
+        foreach ($specialties as $specialty) {
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $specialty->getName());
+
+            $members = '';
+            foreach ($schedules as $schedule) {
+                $member           = $schedule->getMember();
+                $specialtySchedule = $schedule->getSpecialty();
+
+                if (!is_null($member) && !is_null($specialtySchedule) && $specialtySchedule->getId() == $specialty->getId()) {      
+                    $members .= $member->getFirstname().' '.$member->getLastname().', ';
+                }
+            }
+
+            if (!empty($members)) {
+                $members = substr($members, 0, -2);
+                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
+            }
+
+            $cellY++;
+        }
+
+        // Sans rôle
         $cellY++;
         $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, 'Membres présents sans rôle');
 

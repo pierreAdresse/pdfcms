@@ -114,7 +114,8 @@ class ManagementController extends Controller
         $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, 'Membres présents sans rôle');
 
         foreach ($schedules as $schedule) {
-            $member = $schedule->getMember();
+            $member           = $schedule->getMember();
+            $activitySchedule = $schedule->getActivity();
 
             if (!is_null($member) && is_null($activitySchedule)) {
                 $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $member->getFirstname().' '.$member->getLastname());

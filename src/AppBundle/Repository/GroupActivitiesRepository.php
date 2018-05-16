@@ -34,6 +34,7 @@ class GroupActivitiesRepository extends \Doctrine\ORM\EntityRepository
             FROM AppBundle:GroupActivities ga
             JOIN ga.activities a
             LEFT JOIN a.schedules s WITH (s.member = :member AND s.activity IS NOT NULL)
+            JOIN s.cinescenie c WITH (c.isTraining = 0)
             WHERE a.allowForDivision = 1
             GROUP BY ga.id
             '

@@ -17,11 +17,17 @@ class ChoiceCinescenieType extends AbstractType
             ->add('cinescenie', ChoiceType::class, [
                 'choices' => $cinescenies,
                 'choice_label' => function($cinescenie, $key, $index) {
-                    $day   = $this->getDayFr($cinescenie->getDate());
-                    $month = $this->getMonthFr($cinescenie->getDate());
+                    $day   = $this->getStringDayFr($cinescenie->getDate());
+                    $month = $this->getStringMonthFr($cinescenie->getDate());
                     $dayNum = $cinescenie->getDate()->format('j');
                     $then   = $cinescenie->getDate()->format('Y à H:i');
-                    return "$day $dayNum $month $then";
+
+                    $r = '';
+                    if ($cinescenie->getIsTraining()) {
+                        $r = 'R | ';
+                    }
+
+                    return "$r$day $dayNum $month $then";
 
                     /*
                     $formatter = new \IntlDateFormatter(
@@ -40,7 +46,7 @@ class ChoiceCinescenieType extends AbstractType
         );
     }
 
-    private function getDayFr($date)
+    private function getStringDayFr($date)
     {
         switch ($date->format('w')) {
             case 0:
@@ -67,7 +73,7 @@ class ChoiceCinescenieType extends AbstractType
         }
     }
 
-    private function getMonthFr($date)
+    private function getStringMonthFr($date)
     {
         switch ($date->format('n')) {
             case 1:

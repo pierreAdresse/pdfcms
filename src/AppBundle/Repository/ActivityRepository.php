@@ -12,6 +12,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
             SELECT a.name, COUNT(s) AS numberOfTimes
             FROM AppBundle:Activity a
             LEFT JOIN a.schedules s WITH (s.member = :member AND s.activity IS NOT NULL)
+            JOIN s.cinescenie c WITH (c.isTraining = 0)
             WHERE a.allowForDivision = 1
             GROUP BY a.id
             ORDER BY a.ranking ASC

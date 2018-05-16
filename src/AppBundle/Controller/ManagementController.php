@@ -746,7 +746,9 @@ class ManagementController extends Controller
         $defaultCinescenies = $serviceCinescenie->getCurrentsByMember($member);
         $year               = $serviceDate->getSeasonYear();
 
-        $form = $this->createForm(ChoiceMultiCinescenieType::class, $cinescenies, ['defaultCinescenies' => $defaultCinescenies]);
+        $form = $this->createForm(ChoiceMultiCinescenieType::class, $cinescenies, [
+            'defaultCinescenies' => $defaultCinescenies,
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

@@ -177,7 +177,7 @@
                                     <tr>
                                         <td>
                                             <input type="checkbox"{% if presence %} checked{% endif %}>
-                                            <label class="without-margin">{% if cinescenie.isTraining %}<b title="Répétition">R</b> | {% endif %}{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y à HH:mm')|capitalize }}</label>
+                                            <label class="without-margin">{% if cinescenie.isTraining %}<b title="Répétition">R</b> | {% endif %}{{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL Y')|capitalize }} ({{cinescenie.date|localizeddate('none', 'none', null, null, 'HH:mm')}})</label>
                                         </td>
                                         <td>
                                             {% if activityName %}

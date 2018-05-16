@@ -97,6 +97,8 @@
                     {% if schedule.activity is null %}
                         {% if schedule.member.deleted == 0 %}
                             <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> |
+                        {% else %}
+                            {{ schedule.member.firstname }} {{ schedule.member.lastname }} |
                         {% endif %}
                     {% endif %}
                 {% endif %}

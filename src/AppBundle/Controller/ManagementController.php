@@ -320,9 +320,12 @@ class ManagementController extends Controller
                     if (!is_null($memberResult)) {
                         $membersSelected[]   = $memberResult;
                         $lastGroupActivities = $serviceMember->getLastGroupActivities($memberResult, $cinescenie, $date);
-                        $activity            = $serviceMember->getActivityBySpecialityAndLastGroupActivities($memberResult, $specialty, $lastGroupActivities);
-                        $serviceMember->setActivityAndSpecialtyForMember($memberResult, $activity, $specialty, $cinescenie);
-                        $activitiesComplete[] = $activity->getId();
+                        $activity            = $serviceMember->getActivityBySpecialityAndLastGroupActivities($memberResult, $specialty, $lastGroupActivities, $activitiesComplete);
+
+                        if (!is_null($activity)) {
+                            $serviceMember->setActivityAndSpecialtyForMember($memberResult, $activity, $specialty, $cinescenie);
+                            $activitiesComplete[] = $activity->getId();
+                        }
                     } else {
                         // Aucun membre trouvé donc il y aura une alerte sur le planning en question et sur le tableau de bord pour avertir qu'il n'y a pas ce spécialiste.
                     }
@@ -981,12 +984,12 @@ class ManagementController extends Controller
         $numberPresenceWithActivity = $numberPresence - $numberPresenceWithoutActivity;
 
         $stats[] = [
-            'name'          => 'Suppléant',
+            'name'          => 'Sans rôle',
             'numberOfTimes' => $numberPresenceWithoutActivity,
         ];
 
         $gaStats[] = [
-            'name'          => 'Sans activité',
+            'name'          => 'Sans rôle',
             'numberOfTimes' => $numberPresenceWithoutActivity,
         ];
 

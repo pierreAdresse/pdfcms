@@ -27,8 +27,9 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
 
     public function getOrderByNumberOfTimesForMemberAndGroupActivities($member, $groupActivities)
     {
-        $whereClause = ' ';
-        $parameters  = ['member' => $member];
+        $whereClause  = ' ';
+        $memberSkills = $member->getMemberSkills();
+        $parameters   = ['member' => $member];
 
         if (!is_null($groupActivities)) {
             $whereClause = ' AND a.groupActivities = :groupActivities ';
@@ -45,7 +46,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
             .$whereClause.
             '
             GROUP BY a.id
-            ORDER BY numberOfTimes ASC, ranking ASC
+            ORDER BY numberOfTimes ASC, a.ranking ASC
             '
         ;
 

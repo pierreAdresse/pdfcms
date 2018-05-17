@@ -425,7 +425,7 @@ class MemberService
     }
 
     // Cette fonction renvoie le rôle d'un membre en fonction d'une spécialité et d'un groupe de rôle à éviter
-    public function getActivityBySpecialityAndLastGroupActivities($member, $specialty, $lastGroupActivities)
+    public function getActivityBySpecialityAndLastGroupActivities($member, $specialty, $lastGroupActivities, $activitiesComplete)
     {
         $specialtyActivities = $specialty->getSpecialtyActivities();
 
@@ -440,6 +440,12 @@ class MemberService
                 $speGroupActivities[] = $specialtyActivity->getActivity()->getGroupActivities()->getId();
             }
         }
+
+        $member = $this
+            ->em
+            ->getRepository('AppBundle:Member')
+            ->find($member)
+        ;
 
         $groupActivities = $this
             ->em
@@ -463,11 +469,11 @@ class MemberService
 
         $resultActivity = null;
         foreach ($activities as $activity) {
-            if (empty($speActivities) || in_array($activity[0]->getId(), $speActivities)) {
+            if (!in_array($activity[0]->getId(), $activitiesComplete) && ((empty($speActivities) || in_array($activity[0]->getId(), $speActivities)))) {
                 $resultActivity = $activity[0];
                 break;
             }
-        }      
+        }   
 
         return $resultActivity;
     }

@@ -15,7 +15,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
             JOIN s.cinescenie c WITH (c.isTraining = 0)
             WHERE a.allowForDivision = 1
             GROUP BY a.id
-            ORDER BY a.ranking ASC
+            ORDER BY a.orderDisplay ASC
             '
         )->setParameters([
             'member' => $member,

@@ -44,7 +44,7 @@ class ManagementController extends Controller
 
         $specialties = $this->getDoctrine()
             ->getRepository('AppBundle:Specialty')
-            ->findAll()
+            ->findBy([], ['ranking' => 'ASC'])
         ;
 
         $schedules = $this->getDoctrine()
@@ -283,7 +283,7 @@ class ManagementController extends Controller
 
             $specialties = $this->getDoctrine()
                 ->getRepository('AppBundle:Specialty')
-                ->findAll()
+                ->findBy([], ['ranking' => 'ASC'])
             ;
 
             $date = $serviceDate->getSeasonDate();
@@ -424,7 +424,7 @@ class ManagementController extends Controller
 
         $specialties = $this->getDoctrine()
             ->getRepository('AppBundle:Specialty')
-            ->findAll()
+            ->findBy([], ['ranking' => 'ASC'])
         ;
 
         $schedules = $this->getDoctrine()
@@ -743,7 +743,7 @@ class ManagementController extends Controller
     {
         $specialties = $this->getDoctrine()
           ->getRepository('AppBundle:Specialty')
-          ->findAll()
+          ->findBy([], ['ranking' => 'ASC'])
         ;
 
         $defaultSpecialties = $this->getDoctrine()
@@ -948,7 +948,7 @@ class ManagementController extends Controller
 
         $specialties = $this->getDoctrine()
             ->getRepository('AppBundle:Specialty')
-            ->findAll()
+            ->findBy([], ['ranking' => 'ASC'])
         ;
 
         $stats = $this->getDoctrine()
@@ -958,6 +958,11 @@ class ManagementController extends Controller
 
         $gaStats = $this->getDoctrine()
             ->getRepository('AppBundle:GroupActivities')
+            ->getSchedulesForMember($member)
+        ;
+
+        $speStats = $this->getDoctrine()
+            ->getRepository('AppBundle:Specialty')
             ->getSchedulesForMember($member)
         ;
 
@@ -983,6 +988,17 @@ class ManagementController extends Controller
         $numberPresence             = count($schedules);
         $numberPresenceWithActivity = $numberPresence - $numberPresenceWithoutActivity;
 
+        $schedules = $this->getDoctrine()
+            ->getRepository('AppBundle:Schedule')
+            ->findBy([
+                'member'     => $member,
+                'specialty'  => null,
+                'cinescenie' => $cinesceniesWithoutTraining,
+            ])
+        ;
+
+        $numberPresenceWithoutSpecialty = count($schedules);
+
         $stats[] = [
             'name'          => 'Sans rôle',
             'numberOfTimes' => $numberPresenceWithoutActivity,
@@ -993,6 +1009,11 @@ class ManagementController extends Controller
             'numberOfTimes' => $numberPresenceWithoutActivity,
         ];
 
+        $speStats[] = [
+            'name'          => 'Sans spécialité',
+            'numberOfTimes' => $numberPresenceWithoutSpecialty,
+        ];
+
         return $this->render('management/member/general.html.twig', [
             'skills'                     => $skills,
             'specialties'                => $specialties,
@@ -1001,6 +1022,7 @@ class ManagementController extends Controller
             'year'                       => $year,
             'stats'                      => $stats,
             'gaStats'                    => $gaStats,
+            'speStats'                   => $speStats,
             'numberPresenceWithActivity' => $numberPresenceWithActivity,
             'numberPresence'             => $numberPresence,
         ]);

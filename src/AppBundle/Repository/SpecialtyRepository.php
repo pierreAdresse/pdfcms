@@ -20,4 +20,24 @@ class SpecialtyRepository extends \Doctrine\ORM\EntityRepository
 
         return $specialties;
     }
+
+    public function getSchedulesForMember($member)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT sp.name, COUNT(sc) AS numberOfTimes
+            FROM AppBundle:Specialty sp
+            LEFT JOIN sp.schedules sc WITH (sc.member = :member AND sc.specialty IS NOT NULL)
+            JOIN sc.cinescenie c WITH (c.isTraining = 0)
+            GROUP BY sp.id
+            ORDER BY sp.ranking ASC
+            '
+        )->setParameters([
+            'member' => $member,
+        ]);
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
 }

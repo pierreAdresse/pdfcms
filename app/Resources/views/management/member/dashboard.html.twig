@@ -16,13 +16,15 @@
 	        {% endfor %}
 	    </p>
 
-	    <h3>Cinéscénie dans lesquelles il manque des membres</h3>
+	    <h3>Cinéscénies futures dans lesquelles il manque des membres</h3>
 
 	    <p>
 	        {% for cine in cineComplete %}
-                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cine.cinescenie.id}) }}">
-                    {{ cine.cinescenie.date|date("d/m/y") }}
-                </a> (besoin de {{ cine.manque }}) |
+	        	{% if cine.cinescenie.date|date('ymd') >= 'now'|date('ymd') %}
+	                <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cine.cinescenie.id}) }}">
+	                    {{ cine.cinescenie.date|date("d/m/y") }}
+	                </a> (besoin de {{ cine.manque }}) |
+            	{% endif %}
 	        {% endfor %}
 	    </p>
     </section>

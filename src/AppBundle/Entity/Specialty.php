@@ -50,6 +50,13 @@ class Specialty
      */
     private $schedules;
 
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="ranking", type="integer", unique=false)
+     */
+    private $ranking;
+
     public function __construct() {
         $this->specialtyActivities = new ArrayCollection();
         $this->memberSpecialties   = new ArrayCollection();
@@ -190,5 +197,29 @@ class Specialty
     public function getSchedules()
     {
         return $this->schedules;
+    }
+
+    /**
+     * Set ranking
+     *
+     * @param integer $ranking
+     *
+     * @return Specialty
+     */
+    public function setRanking($ranking)
+    {
+        $this->ranking = $ranking;
+
+        return $this;
+    }
+
+    /**
+     * Get ranking
+     *
+     * @return integer
+     */
+    public function getRanking()
+    {
+        return $this->ranking;
     }
 }

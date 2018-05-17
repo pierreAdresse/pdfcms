@@ -45,7 +45,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
             .$whereClause.
             '
             GROUP BY a.id
-            ORDER BY numberOfTimes ASC
+            ORDER BY numberOfTimes ASC, ranking ASC
             '
         ;
 

@@ -55,14 +55,15 @@ class MemberService
             $isFind = false;
             foreach ($cinePlayMembers as $cinePlayMember) {
                 if ($cinePresentMember[0]->getId() == $cinePlayMember['id']) {
-                    $isFind = true;
-                    $members[$key]['counter'] = $cinePlayMember['totalCinePlay'] .'/'. $cinePresentMember['countCinescenies'];
+                    $isFind  = true;
+                    $percent = round($cinePlayMember['totalCinePlay'] / $cinePresentMember['countCinescenies'] * 100, 0);
+                    $members[$key]['counter'] = $cinePlayMember['totalCinePlay'] .'/'. $cinePresentMember['countCinescenies'].' ('.$percent.'%)';
                     break;
                 }
             }
 
             if (!$isFind) {
-                $members[$key]['counter'] = '0/'. $cinePresentMember['countCinescenies'];
+                $members[$key]['counter'] = '0/'. $cinePresentMember['countCinescenies'].' (0%)';
             }
         }
 
@@ -156,7 +157,6 @@ class MemberService
             return $ratioMembers[0];
         }
 
-
         // Membres dont le nombre de fois fait le groupe de rôle est le plus petit
         $groupActMembers = $this->orderByGroupActivities($ratioMembers, $activity, $pastCinescenies);
 
@@ -166,7 +166,7 @@ class MemberService
         }
 
         // Membres dont le nombre de fois fait le rôle est le plus petit
-        $activityMembers = $this->orderByActivity($ratioMembers, $activity, $pastCinescenies);
+        $activityMembers = $this->orderByActivity($groupActMembers, $activity, $pastCinescenies);
 
         // Le premier membre est sélectionné
         return $activityMembers[0];

@@ -30,9 +30,9 @@ class Date
         $day    = $this->getStringDayFr($date);
         $month  = $this->getStringMonthFr($date);
         $dayNum = $date->format('j');
-        $then   = $date->format('Y à H:i');
+        $year   = $date->format('Y');
 
-        return "OK $day $dayNum $month $then";
+        return "$day $dayNum $month $year";
     }
 
     private function getStringDayFr($date)

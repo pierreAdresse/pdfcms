@@ -29,10 +29,113 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ManagementController extends Controller
 {
-
     /**
      * @Route("/gestion/membres/planning/{cinescenie}/excel", name="memberScheduleExcel")
      */
+    public function scheduleExcelAction(Request $request, Cinescenie $cinescenie, Date $serviceDate)
+    {
+        $readerXlsx  = $this->get('phpoffice.spreadsheet')->createReader('Xlsx');
+        $spreadsheet = $readerXlsx->load('schedule/FDR20180518.xlsx');
+
+        // Date
+        $date = $serviceDate->transformDatetimeToStringFr($cinescenie->getDate());
+        $spreadsheet->getActiveSheet()->setCellValue('I1', $date);
+
+        // Rôles
+        $activities = $this->getDoctrine()
+            ->getRepository('AppBundle:Activity')
+            ->findBy([
+                'allowForDivision' => true,
+            ])
+        ;
+
+        foreach ($activities as $activity) {
+            $cellExcel = $activity->getCellExcel();
+
+            if (!empty($cellExcel)) {
+                $schedules = $this->getDoctrine()
+                    ->getRepository('AppBundle:Schedule')
+                    ->findBy([
+                        'cinescenie' => $cinescenie,
+                        'activity'   => $activity,
+                    ])
+                ;
+
+                $members = '';
+                foreach ($schedules as $schedule) {
+                    $member      = $schedule->getMember();
+                    $firstLetter = substr($member->getLastname(), 0, 1);
+                    $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                }
+
+                if (!empty($members)) {
+                    $members = substr($members, 0, -2);
+                    $spreadsheet->getActiveSheet()->setCellValue($cellExcel, $members);
+                }
+            }
+        }
+
+        // Spécialités
+        $specialties = $this->getDoctrine()
+            ->getRepository('AppBundle:Specialty')
+            ->findAll()
+        ;
+
+        foreach ($specialties as $specialty) {
+            $cellExcel = $specialty->getCellExcel();
+
+            if (!empty($cellExcel)) {
+                $schedules = $this->getDoctrine()
+                    ->getRepository('AppBundle:Schedule')
+                    ->findBy([
+                        'cinescenie' => $cinescenie,
+                        'specialty'  => $specialty,
+                    ])
+                ;
+
+                $members = '';
+                foreach ($schedules as $schedule) {
+                    $member      = $schedule->getMember();
+                    $firstLetter = substr($member->getLastname(), 0, 1);
+                    $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                }
+
+                if (!empty($members)) {
+                    $members = substr($members, 0, -2);
+                    $spreadsheet->getActiveSheet()->setCellValue($cellExcel, $members);
+                }
+            }
+        }
+
+        // Sans rôle
+        $schedules = $this->getDoctrine()
+            ->getRepository('AppBundle:Schedule')
+            ->findBy([
+                'cinescenie' => $cinescenie,
+                'activity'   => null,
+            ])
+        ;
+
+        $members = '';
+        foreach ($schedules as $schedule) {
+            $member      = $schedule->getMember();
+            $firstLetter = substr($member->getLastname(), 0, 1);
+            $members    .= $member->getFirstname().' '.$firstLetter.', ';
+        }
+
+        if (!empty($members)) {
+            $members = substr($members, 0, -2);
+            $spreadsheet->getActiveSheet()->setCellValue('E35', $members);
+        }
+
+        // Ecriture
+        $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
+        $writerXlsx->save('tmpSchedule.xlsx');
+
+        return new BinaryFileResponse('tmpSchedule.xlsx');
+    }
+
+    /*
     public function scheduleExcelAction(Request $request, Cinescenie $cinescenie)
     {
         $activities = $this->getDoctrine()
@@ -135,10 +238,11 @@ class ManagementController extends Controller
         $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
         $writerXlsx->save('destination.xlsx');
         */
-
+        /*
         return new BinaryFileResponse('planning.xlsx');
         //return $this->render('management/member/excel.html.twig');
     }
+    */
 
     /**
      * @Route("/gestion/membres/tableau-de-bord", name="memberDashboard")

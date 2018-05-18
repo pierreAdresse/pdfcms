@@ -80,6 +80,13 @@ class Activity
      */
     private $allowForDivision;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="cellExcel", type="string", length=255)
+     */
+    private $cellExcel;
+
     public function __construct() {
         $this->shedules        = new ArrayCollection();
         $this->skillActivities = new ArrayCollection();
@@ -315,5 +322,29 @@ class Activity
     public function getOrderDisplay()
     {
         return $this->orderDisplay;
+    }
+
+    /**
+     * Set cellExcel
+     *
+     * @param string $cellExcel
+     *
+     * @return Activity
+     */
+    public function setCellExcel($cellExcel)
+    {
+        $this->cellExcel = $cellExcel;
+
+        return $this;
+    }
+
+    /**
+     * Get cellExcel
+     *
+     * @return string
+     */
+    public function getCellExcel()
+    {
+        return $this->cellExcel;
     }
 }

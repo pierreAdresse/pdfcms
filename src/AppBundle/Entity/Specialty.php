@@ -57,6 +57,13 @@ class Specialty
      */
     private $ranking;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="cellExcel", type="string", length=255)
+     */
+    private $cellExcel;
+
     public function __construct() {
         $this->specialtyActivities = new ArrayCollection();
         $this->memberSpecialties   = new ArrayCollection();
@@ -221,5 +228,29 @@ class Specialty
     public function getRanking()
     {
         return $this->ranking;
+    }
+
+    /**
+     * Set cellExcel
+     *
+     * @param string $cellExcel
+     *
+     * @return Specialty
+     */
+    public function setCellExcel($cellExcel)
+    {
+        $this->cellExcel = $cellExcel;
+
+        return $this;
+    }
+
+    /**
+     * Get cellExcel
+     *
+     * @return string
+     */
+    public function getCellExcel()
+    {
+        return $this->cellExcel;
     }
 }

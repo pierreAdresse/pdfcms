@@ -13,8 +13,8 @@
         {% endfor %}
 
         <p>
-            <i class="fa fa-check"></i> : Date où tous les participants pour les rôles sont trouvés.<br>
-            <i class="fa fa-times"></i> : Date où il manque des participants.
+            <i class="fa fa-check green"></i> : Date où tous les participants pour les rôles sont trouvés.<br>
+            <i class="fa fa-times red"></i> : Date où il manque des participants.
         </p>
 
         <h3>Dates à venir</h3>
@@ -24,7 +24,7 @@
                 <tr>
                     <th></th>
                     <th>Date</th>
-                    <th>Présence</th>
+                    <th>Type</th>
                     <th class="align-right">Total</th>
                 </tr>
             </thead>
@@ -34,34 +34,22 @@
                         <tr>
                             <td>
                                 {% if cineComplete[cinescenie.id] %}
-                                    <i class="fa fa-check"></i>
+                                    <i class="fa fa-check green"></i>
                                 {% else %}
-                                    <i class="fa fa-times"></i>
+                                    <i class="fa fa-times red"></i>
                                 {% endif %} 
-
-                                {% if cinescenie.isTraining %}
-                                    <b title="Répétition">R</b>
-                                {% endif %}
                             </td>
                             <td>
                                 <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
-                                    {{ cinescenie.date|date("d/m/y") }}
+                                    {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y à HH:mm')|capitalize }}
                                 </a>
-                                <br/>
-                                {{ cinescenie.date|date("H:i") }}
                             </td>
                             <td>
-                                {% for schedule in cinescenie.schedules %}
-                                    {% if schedule.member %}
-                                        {% if schedule.member.deleted %}
-                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
-                                        {% else %}
-                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
-                                        {% endif %}
-                                        {% if schedule.activity %} ({{ schedule.activity.name }}{% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
-                                        {% if not loop.last %}, {% endif %}
-                                    {% endif %}
-                                {% endfor %}
+                                {% if cinescenie.isTraining %}
+                                    Répétition
+                                {% else %}
+                                    Cinéscénie
+                                {% endif %}
                             </td>
                             <td class="align-right">{{ cinescenie.schedules|length }}</td>
                         </tr>
@@ -86,34 +74,22 @@
                         <tr>
                             <td>
                                 {% if cineComplete[cinescenie.id] %}
-                                    <i class="fa fa-check"></i>
+                                    <i class="fa fa-check green"></i>
                                 {% else %}
-                                    <i class="fa fa-times"></i>
-                                {% endif %}
-
-                                {% if cinescenie.isTraining %}
-                                    <b title="Répétition">R</b>
+                                    <i class="fa fa-times red"></i>
                                 {% endif %}
                             </td>
                             <td>
                                 <a href="{{ path('memberScheduleEditActivities', {'cinescenie': cinescenie.id}) }}">
-                                    {{ cinescenie.date|date("d/m/y") }}
+                                    {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y à HH:mm')|capitalize }}
                                 </a>
-                                <br/>
-                                {{ cinescenie.date|date("H:i") }}
                             </td>
                             <td>
-                                {% for schedule in cinescenie.schedules %}
-                                    {% if schedule.member %}
-                                        {% if schedule.member.deleted %}
-                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
-                                        {% else %}
-                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname|first }}</a>
-                                        {% endif %}
-                                        {% if schedule.activity %} ({{ schedule.activity.name }}{% if schedule.specialty %} / {{ schedule.specialty.name }}{% endif %}){% endif %}
-                                        {% if not loop.last %}, {% endif %}
-                                    {% endif %}
-                                {% endfor %}
+                                {% if cinescenie.isTraining %}
+                                    Répétition
+                                {% else %}
+                                    Cinéscénie
+                                {% endif %}
                             </td>
                             <td class="align-right">{{ cinescenie.schedules|length }}</td>
                         </tr>

@@ -335,7 +335,7 @@ class ManagementController extends Controller
         foreach ($cinescenies as $cinescenie) {
             $activitiesId  = [];
             $specialtiesId = [];
-            $schedules    = $cinescenie->getSchedules();
+            $schedules     = $cinescenie->getSchedules();
             foreach ($schedules as $schedule) {
                 $activity  = $schedule->getActivity();
                 $specialty = $schedule->getSpecialty();

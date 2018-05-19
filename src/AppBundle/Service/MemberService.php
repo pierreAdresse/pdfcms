@@ -57,13 +57,15 @@ class MemberService
                 if ($cinePresentMember[0]->getId() == $cinePlayMember['id']) {
                     $isFind  = true;
                     $percent = round($cinePlayMember['totalCinePlay'] / $cinePresentMember['countCinescenies'] * 100, 0);
-                    $members[$key]['counter'] = $cinePlayMember['totalCinePlay'] .'/'. $cinePresentMember['countCinescenies'].' ('.$percent.'%)';
+                    $members[$key]['counter'] = $cinePlayMember['totalCinePlay'] .'/'. $cinePresentMember['countCinescenies'];
+                    $members[$key]['ratio']   = $percent.'%';
                     break;
                 }
             }
 
             if (!$isFind) {
-                $members[$key]['counter'] = '0/'. $cinePresentMember['countCinescenies'].' (0%)';
+                $members[$key]['counter'] = '0/'. $cinePresentMember['countCinescenies'];
+                $members[$key]['ratio']   = '0%';
             }
         }
 

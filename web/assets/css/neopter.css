@@ -18,14 +18,6 @@ table.compact tbody tr td:first-child {
 	width: 1%;
 }
 
-table.compact thead tr th:nth-child(2) {
-	width: 1%;
-}
-
-table.compact tbody tr td:nth-child(2) {
-	width: 1%;
-}
-
 table.min thead tr th:nth-child(2) {
 	width: 1%;
 }

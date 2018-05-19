@@ -17,6 +17,7 @@
                         <th onclick="sortTable(0)">Prénom</th>
                         <th onclick="sortTable(1)">Nom</th>
                         <th>Cinéscénie</th>
+                        <th>Ratio</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,6 +35,7 @@
                                 <a href="{{ path('memberGeneral', {'member': member.member.id}) }}">{{ member.member.lastname }}</a>
                             </td>
                             <td>{{ member.counter }}</td>
+                            <td>{{ member.ratio }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

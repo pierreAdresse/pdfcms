@@ -24,6 +24,7 @@ use AppBundle\Entity\MemberSpecialty;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use AppBundle\Service\Cinescenie as CinescenieService;
 use AppBundle\Service\Date;
+use AppBundle\Service\Logn;
 use AppBundle\Service\MemberService;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -959,7 +960,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/{member}/editer-planning", name="memberEditSchedule")
      */
-    public function editScheduleAction(CinescenieService $serviceCinescenie, Date $serviceDate, Request $request, Member $member)
+    public function editScheduleAction(CinescenieService $serviceCinescenie, Date $serviceDate, Request $request, Member $member, Logn $log)
     {
         $cinescenies        = $serviceCinescenie->getCurrents();
         $defaultCinescenies = $serviceCinescenie->getCurrentsByMember($member);
@@ -993,8 +994,10 @@ class ManagementController extends Controller
             }
 
             // Planning à supprimer
+            $messageLog          = 'Mise à jour du planning de '.$member->getFirstname().' '.$member->getLastname().' ('.$member->getId().') / Suppression des dates : ';
             $cinesceniesToDelete = array_diff_key($cinesceniesFromSchedules, $cinesceniesFromForm);
             foreach ($cinesceniesToDelete as $cineToDelete) {
+                $messageLog .= $cineToDelete->getDate()->format('d/m/Y').' ('.$cineToDelete->getId().') ';
                 $schedule = $this->getDoctrine()
                   ->getRepository('AppBundle:Schedule')
                   ->findOneBy([
@@ -1003,13 +1006,14 @@ class ManagementController extends Controller
                     ])
                 ;
 
-                // TODO: protection pour empêcher de supprimer un planning passé ?
                 $em->remove($schedule);
             }
 
             // Planning à ajouter
+            $messageLog .= '/ Ajout des dates : ';
             $cinesceniesToAdd = array_diff_key($cinesceniesFromForm, $cinesceniesFromSchedules);
             foreach ($cinesceniesToAdd as $cineToAdd) {
+                $messageLog .= $cineToAdd->getDate()->format('d/m/Y').' ('.$cineToAdd->getId().') ';
                 $schedule = new Schedule();
                 $schedule->setMember($member);
                 $schedule->setCinescenie($cineToAdd);
@@ -1017,6 +1021,8 @@ class ManagementController extends Controller
             }
 
             $em->flush();
+
+            $log->log($this->getUser(), $messageLog);
 
             $this->addFlash(
                 'notice',

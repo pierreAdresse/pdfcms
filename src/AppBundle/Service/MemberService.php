@@ -159,19 +159,26 @@ class MemberService
             return $ratioMembers[0];
         }
 
-        // Membres dont le nombre de fois fait le groupe de rôle est le plus petit
-        $groupActMembers = $this->orderByGroupActivities($ratioMembers, $activity, $pastCinescenies);
+        // Membres dont le nombre de fois fait le rôle est le plus petit
+        $activityMembers = $this->orderByActivity($ratioMembers, $activity, $pastCinescenies);
+        
+        if (count($activityMembers) == 1) {
+            // Un seul membre disponible le rôle est pour lui
+            return $activityMembers[0];
+        }
 
+        // Membres dont le nombre de fois fait le groupe de rôle est le plus petit
+        $groupActMembers = $this->orderByGroupActivities($activityMembers, $activity, $pastCinescenies);
+
+        /*
         if (count($groupActMembers) == 1) {
             // Un seul membre disponible le rôle est pour lui
             return $groupActMembers[0];
         }
-
-        // Membres dont le nombre de fois fait le rôle est le plus petit
-        $activityMembers = $this->orderByActivity($groupActMembers, $activity, $pastCinescenies);
+        */
 
         // Le premier membre est sélectionné
-        return $activityMembers[0];
+        return $groupActMembers[0];
     }
 
     // Cette fonction renvoie les membres qui ne sont pas déjà choisi dans le planning et qui sont présent le jour de la cinéscénie
@@ -290,7 +297,7 @@ class MemberService
             ->getOrderByGroupActivities($members, $activities, $pastCinescenies)
         ;
 
-        $members = $this->isolateFirstMembers($members, 3);
+        $members = $this->isolateFirstMembers($members);
 
         return $members;
     }

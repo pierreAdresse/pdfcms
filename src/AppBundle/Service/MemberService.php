@@ -272,8 +272,8 @@ class MemberService
             $membersResult[$key]['counter'] = $ratio;
         }
 
-        if (!empty($totalCineMembers)) {
-            $members = $this->isolateFirstMembers($membersResult);
+        if (!empty($membersResult)) {
+            $members = $this->isolateFirstMembers($membersResult, 5);
         }
 
         return $members;
@@ -290,7 +290,7 @@ class MemberService
             ->getOrderByGroupActivities($members, $activities, $pastCinescenies)
         ;
 
-        $members = $this->isolateFirstMembers($members);
+        $members = $this->isolateFirstMembers($members, 3);
 
         return $members;
     }
@@ -309,22 +309,30 @@ class MemberService
     }
 
     // Cette fonction permet d'isoler les premiers membres 
-    private function isolateFirstMembers($members)
+    private function isolateFirstMembers($members, $limit = null)
     {
         foreach ($members as $key => $row) {
-            $id[$key]  = $row['id'];
+            $id[$key]      = $row['id'];
             $counter[$key] = $row['counter'];
         }
 
         array_multisort($counter, SORT_ASC, $members);
 
-        $counter = $members[0]['counter'];
-        $membersResult = [];
-        foreach ($members as $member) {
-            if ($member['counter'] > $counter) {
-                break;
+        if (is_null($limit)) {
+            $counter       = $members[0]['counter'];
+            $membersResult = [];
+            foreach ($members as $member) {
+                if ($member['counter'] > $counter) {
+                    break;
+                }
+                $membersResult[] = $member['id'];
             }
-            $membersResult[] = $member['id'];
+        } else {
+            $membersResult = [];
+            foreach ($members as $member) {
+                $membersResult[] = $member['id'];
+            }
+            $membersResult = array_slice($input, 0, $limit);
         }
 
         return $membersResult;

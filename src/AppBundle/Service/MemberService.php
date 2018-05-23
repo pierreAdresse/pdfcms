@@ -263,7 +263,7 @@ class MemberService
             }
 
             if ($isFind) {
-                $ratio = $totalCinePlay / $totalCineMember['totalCine'];
+                $ratio = round($totalCinePlay / $totalCineMember['totalCine'] * 100, 0);
             } else {
                 $ratio = 0;
             }

@@ -332,7 +332,7 @@ class MemberService
             foreach ($members as $member) {
                 $membersResult[] = $member['id'];
             }
-            $membersResult = array_slice($input, 0, $limit);
+            $membersResult = array_slice($membersResult, 0, $limit);
         }
 
         return $membersResult;

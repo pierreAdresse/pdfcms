@@ -273,7 +273,7 @@ class MemberService
         }
 
         if (!empty($membersResult)) {
-            $members = $this->isolateFirstMembers($membersResult, 5);
+            $members = $this->isolateFirstMembers($membersResult, 3);
         }
 
         return $members;

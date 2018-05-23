@@ -395,7 +395,7 @@ class ManagementController extends Controller
 
             $cinescenies = $this->getDoctrine()
                 ->getRepository('AppBundle:Cinescenie')
-                ->getByDateGreaterThan($cinescenie->getDate())
+                ->getByDateGreaterThanWithoutTraining($cinescenie->getDate())
             ;
 
             foreach($cinescenies as $key => $cinescenie) {

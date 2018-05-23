@@ -280,7 +280,7 @@ class MemberService
         }
 
         if (!empty($membersResult)) {
-            $members = $this->isolateFirstMembers($membersResult, 3);
+            $members = $this->isolateFirstMembers($membersResult);
         }
 
         return $members;
@@ -316,7 +316,7 @@ class MemberService
     }
 
     // Cette fonction permet d'isoler les premiers membres 
-    private function isolateFirstMembers($members, $limit = null)
+    private function isolateFirstMembers($members)
     {
         foreach ($members as $key => $row) {
             $id[$key]      = $row['id'];
@@ -325,21 +325,13 @@ class MemberService
 
         array_multisort($counter, SORT_ASC, $members);
 
-        if (is_null($limit)) {
-            $counter       = $members[0]['counter'];
-            $membersResult = [];
-            foreach ($members as $member) {
-                if ($member['counter'] > $counter) {
-                    break;
-                }
-                $membersResult[] = $member['id'];
+        $counter       = $members[0]['counter'];
+        $membersResult = [];
+        foreach ($members as $member) {
+            if ($member['counter'] > $counter) {
+                break;
             }
-        } else {
-            $membersResult = [];
-            foreach ($members as $member) {
-                $membersResult[] = $member['id'];
-            }
-            $membersResult = array_slice($membersResult, 0, $limit);
+            $membersResult[] = $member['id'];
         }
 
         return $membersResult;

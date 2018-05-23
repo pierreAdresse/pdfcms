@@ -69,6 +69,7 @@ class CinescenieRepository extends \Doctrine\ORM\EntityRepository
             SELECT c
             FROM AppBundle:Cinescenie c
             WHERE c.date > :from AND c.date < :to
+            AND c.isTraining = 0
             ORDER BY c.date ASC
             '
         )->setParameters([

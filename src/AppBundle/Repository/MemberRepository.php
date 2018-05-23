@@ -168,7 +168,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
             SELECT m.id, COUNT(sc.id) AS totalCine
             FROM AppBundle:Member m
             JOIN m.schedules sc
-            JOIN sc.cinescenie c WITH (c.date > :from AND c.date < :to)
+            JOIN sc.cinescenie c WITH (c.date > :from AND c.date < :to AND c.isTraining = 0)
             WHERE m.id IN (:members)
             GROUP BY m.id
             ORDER BY totalCine ASC
@@ -190,7 +190,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
             SELECT m.id, COUNT(sc.id) AS totalCinePlay
             FROM AppBundle:Member m
             JOIN m.schedules sc WITH (sc.activity IS NOT NULL)
-            JOIN sc.cinescenie c WITH (c.date > :from AND c.date < :to)
+            JOIN sc.cinescenie c WITH (c.date > :from AND c.date < :to AND c.isTraining = 0)
             WHERE m.id IN (:members)
             GROUP BY m.id
             ORDER BY totalCinePlay ASC

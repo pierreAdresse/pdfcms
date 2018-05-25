@@ -3,7 +3,7 @@
 {% block sections %}
     <section>
         <header class="main">
-            <h2>Cinéscénie du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y à HH:mm') }}</h2>
+            <h2> Planning du {{ cinescenie.date|localizeddate('none', 'none', null, null, 'EEEE d LLLL y à HH:mm') }} <a href="{{ path('memberScheduleExcel', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-file-excel-o"></i></a></h2>
         </header>
 
         {% for flash_message in app.session.flashBag.get('notice') %}
@@ -11,8 +11,6 @@
               <p>{{ flash_message }}</p>
           </div>
         {% endfor %}
-
-        <h3>Planning <a href="{{ path('memberScheduleExcel', {'cinescenie': cinescenie.id}) }}"><i class="fa fa-file-excel-o"></i></a></h3>
 
         <table>
             <thead>

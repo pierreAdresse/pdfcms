@@ -393,16 +393,16 @@ class ManagementController extends Controller
 
             $date = $serviceDate->getSeasonDate();
 
-            $cinescenies = $this->getDoctrine()
+            $cinesceniesWithoutTraining = $this->getDoctrine()
                 ->getRepository('AppBundle:Cinescenie')
                 ->getByDateGreaterThanWithoutTraining($cinescenie->getDate())
             ;
+                
+            $serviceMember->cleanSchedules($cinesceniesWithoutTraining);
 
-            foreach($cinescenies as $key => $cinescenie) {
+            foreach($cinesceniesWithoutTraining as $key => $cinescenie) {
                 // Permet de ne pas dépasser la mémoire allouée
                 set_time_limit(120);
-
-                $serviceMember->cleanSchedules($cinescenie);
 
                 $pastCinescenies = $serviceCinescenie->getCinesceniesBetween($date, $cinescenie->getDate());
 
@@ -627,6 +627,10 @@ class ManagementController extends Controller
                     $schedule->setCinescenie($cinescenie);
                 }
 
+                if ($cinescenie->getIsTraining()) {
+                    $schedule->setIsTraining(true);
+                }
+
                 $schedule->setMember($member);
                 $schedule->setActivity($activity);
                 $em->persist($schedule);
@@ -772,6 +776,10 @@ class ManagementController extends Controller
                 } else {
                     $schedule = new Schedule();
                     $schedule->setCinescenie($cinescenie);
+                }
+
+                if ($cinescenie->getIsTraining()) {
+                    $schedule->setIsTraining(true);
                 }
 
                 $schedule->setMember($member);
@@ -1017,6 +1025,11 @@ class ManagementController extends Controller
                 $schedule = new Schedule();
                 $schedule->setMember($member);
                 $schedule->setCinescenie($cineToAdd);
+
+                if ($cineToAdd->getIsTraining()) {
+                    $schedule->setIsTraining(true);
+                }
+
                 $em->persist($schedule);
             }
 

@@ -139,7 +139,7 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
         return $members; 
     }
 
-    public function getOrderByActiviy($members, $activity, $pastCinescenies)
+    public function getOrderByActivity($members, $activity, $pastCinescenies)
     {
         $em = $this->getEntityManager();
         $query = $em->createQuery(

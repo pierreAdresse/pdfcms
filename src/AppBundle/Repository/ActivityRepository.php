@@ -40,7 +40,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
             '
             SELECT a, COUNT(s) AS numberOfTimes
             FROM AppBundle:Activity a
-            LEFT JOIN a.schedules s WITH (s.member = :member)
+            LEFT JOIN a.schedules s WITH (s.member = :member AND s.isTraining = 0)
             WHERE a.allowForDivision = 1
             '
             .$whereClause.

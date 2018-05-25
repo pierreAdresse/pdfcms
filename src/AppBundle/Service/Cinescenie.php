@@ -63,7 +63,7 @@ class Cinescenie
     {
         $cinescenies = $this->em
             ->getRepository('AppBundle:Cinescenie')
-            ->getByDateGreaterThan(new \Datetime('now'))
+            ->getByDateGreaterThanWithoutTraining(new \Datetime('now'))
         ;
 
         return $cinescenies;

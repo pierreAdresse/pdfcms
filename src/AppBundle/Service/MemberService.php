@@ -73,13 +73,13 @@ class MemberService
     }
 
     // Cette fonction permet d'effacer les rôles d'une cinéscénie et d'enlever les éventuels Laissez passer
-    public function cleanSchedules($cinescenie)
+    public function cleanSchedules($cinescenies)
     {
         // On commence par effacer tous les rôles
         $schedules = $this->em
             ->getRepository('AppBundle:Schedule')
             ->findBy([
-              'cinescenie' => $cinescenie,
+              'cinescenie' => $cinescenies,
             ])
         ;
 
@@ -170,15 +170,9 @@ class MemberService
         // Membres dont le nombre de fois fait le groupe de rôle est le plus petit
         $groupActMembers = $this->orderByGroupActivities($activityMembers, $activity, $pastCinescenies);
 
-        /*
-        if (count($groupActMembers) == 1) {
-            // Un seul membre disponible le rôle est pour lui
-            return $groupActMembers[0];
-        }
-        */
-
-        // Le premier membre est sélectionné
-        return $groupActMembers[0];
+        // Un membre au hasard est sélectionné
+        $randKeys = array_rand($groupActMembers);
+        return $groupActMembers[$randKeys];
     }
 
     // Cette fonction renvoie les membres qui ne sont pas déjà choisi dans le planning et qui sont présent le jour de la cinéscénie
@@ -307,7 +301,7 @@ class MemberService
         $members = $this
             ->em
             ->getRepository('AppBundle:Member')
-            ->getOrderByActiviy($members, $activity, $pastCinescenies)
+            ->getOrderByActivity($members, $activity, $pastCinescenies)
         ;
 
         $members = $this->isolateFirstMembers($members);

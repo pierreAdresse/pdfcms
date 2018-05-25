@@ -51,6 +51,13 @@ class Schedule
     private $specialty;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_training", type="boolean")
+     */
+    private $isTraining;
+
+    /**
      * Get id
      *
      * @return int
@@ -154,5 +161,29 @@ class Schedule
     public function getSpecialty()
     {
         return $this->specialty;
+    }
+
+    /**
+     * Set isTraining
+     *
+     * @param boolean $isTraining
+     *
+     * @return Schedule
+     */
+    public function setIsTraining($isTraining)
+    {
+        $this->isTraining = $isTraining;
+
+        return $this;
+    }
+
+    /**
+     * Get isTraining
+     *
+     * @return boolean
+     */
+    public function getIsTraining()
+    {
+        return $this->isTraining;
     }
 }

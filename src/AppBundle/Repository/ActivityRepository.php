@@ -27,24 +27,13 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
 
     public function getOrderByNumberOfTimesForMemberAndGroupActivities($member, $groupActivities)
     {
-        $whereClause  = ' ';
-        $memberSkills = $member->getMemberSkills();
-        $parameters   = ['member' => $member];
-
-        if (!is_null($groupActivities)) {
-            $whereClause = ' AND a.groupActivities = :groupActivities ';
-            $parameters['groupActivities']  = $groupActivities;
-        }
-
         $sql =
             '
             SELECT a, COUNT(s) AS numberOfTimes
             FROM AppBundle:Activity a
             LEFT JOIN a.schedules s WITH (s.member = :member AND s.isTraining = 0)
             WHERE a.allowForDivision = 1
-            '
-            .$whereClause.
-            '
+            AND a.groupActivities = :groupActivities
             GROUP BY a.id
             ORDER BY numberOfTimes ASC, a.ranking ASC
             '
@@ -53,7 +42,10 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
         $em = $this->getEntityManager();
         $query = $em
             ->createQuery($sql)
-            ->setParameters($parameters)
+            ->setParameters([
+                'member' => $member,
+                'groupActivities' => $groupActivities,
+            ])
         ;
         $activities = $query->getResult();
 

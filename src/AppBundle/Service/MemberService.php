@@ -432,15 +432,20 @@ class MemberService
     {
         $specialtyActivities = $specialty->getSpecialtyActivities();
 
-        $speActivities      = [];
-        $speGroupActivities = [];
+        $speActivitiesLast      = [];
+        $speGroupActivitiesLast = [];
+        $speActivities          = [];
         foreach ($specialtyActivities as $specialtyActivity) {
-            $activity = $specialtyActivity->getActivity();
+            $activity        = $specialtyActivity->getActivity();
             $groupActivities = $activity->getGroupActivities();
+            $speActivities[] = $activity->getId();
 
             if ((!is_null($lastGroupActivities) && $lastGroupActivities->getId() != $groupActivities->getId()) || is_null($lastGroupActivities)) {
-                $speActivities[]      = $specialtyActivity->getActivity()->getId();
-                $speGroupActivities[] = $specialtyActivity->getActivity()->getGroupActivities()->getId();
+                $speActivitiesLast[] = $activity->getId();
+
+                if (!in_array($groupActivities->getId(), $speGroupActivitiesLast)) {
+                    $speGroupActivitiesLast[] = $groupActivities->getId();
+                }
             }
         }
 
@@ -458,10 +463,15 @@ class MemberService
 
         $resultGroupActivities = null;
         foreach ($groupActivities as $groupAct) {
-            if (empty($speGroupActivities) || in_array($groupAct[0]->getId(), $speGroupActivities)) {
+            if (empty($speGroupActivitiesLast) || in_array($groupAct[0]->getId(), $speGroupActivitiesLast)) {
                 $resultGroupActivities = $groupAct[0];
                 break;
             }
+        }
+
+        if (is_null($resultGroupActivities)) {
+            $resultGroupActivities = $lastGroupActivities;
+            $speActivitiesLast     = $speActivities;
         }
 
         $activities = $this
@@ -472,11 +482,11 @@ class MemberService
 
         $resultActivity = null;
         foreach ($activities as $activity) {
-            if (!in_array($activity[0]->getId(), $activitiesComplete) && ((empty($speActivities) || in_array($activity[0]->getId(), $speActivities)))) {
+            if (!in_array($activity[0]->getId(), $activitiesComplete) && ((empty($speActivitiesLast) || in_array($activity[0]->getId(), $speActivitiesLast)))) {
                 $resultActivity = $activity[0];
                 break;
             }
-        }   
+        }
 
         return $resultActivity;
     }

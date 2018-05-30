@@ -25,3 +25,11 @@ table.min thead tr th:nth-child(2) {
 table.min tbody tr td:nth-child(2) {
 	width: 1%;
 }
+
+a.blue-link {
+	color: blue;
+}
+
+span.blue-span {
+	color: blue;
+}

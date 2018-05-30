@@ -11,7 +11,7 @@
 	    <p>
 	        {% for member in members %}
 	            {% if member.countCinescenies < constant('AppBundle\\Entity\\Cinescenie::MIN') %}
-	                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}">{{ member[0].firstname }} {{ member[0].lastname }}</a> ({{ member.countCinescenies }}) |
+	                <a href="{{ path('memberGeneral', {'member': member[0].id}) }}"{% if member[0].isNew %} class="blue-link"{% endif %}>{{ member[0].firstname }} {{ member[0].lastname }}</a> ({{ member.countCinescenies }}) |
 	            {% endif %}
 	        {% endfor %}
 	    </p>

@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Repository\CinescenieRepository;
 use AppBundle\Form\ChoiceSkillType;
+use AppBundle\Form\ChoiceNewType;
 use AppBundle\Form\ChoiceSpecialtyType;
 use AppBundle\Form\ChoiceCinescenieType;
 use AppBundle\Form\ChoiceMultiCinescenieType;
@@ -964,6 +965,36 @@ class ManagementController extends Controller
             'form'   => $form->createView(),
         ]);
     }
+
+    /**
+     * @Route("/gestion/membres/{member}/editer-nouveau", name="memberEditNew")
+     */
+    public function editNewAction(Request $request, Member $member)
+    {
+        $form = $this->createForm(ChoiceNewType::class, $member);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em     = $this->getDoctrine()->getManager();
+            $member = $form->getData();
+
+            $em->persist($member);
+            $em->flush();
+
+            $this->addFlash(
+                'notice',
+                'Les données sont bien enregistrées !'
+            );
+
+            return $this->redirectToRoute('memberGeneral', ['member' => $member->getId()]);
+        }
+
+        return $this->render('management/member/editNew.html.twig', [
+            'member' => $member,
+            'form'   => $form->createView(),
+        ]);
+    }
+
 
     /**
      * @Route("/gestion/membres/{member}/editer-planning", name="memberEditSchedule")

@@ -29,10 +29,10 @@
                                         <i class="fa fa-exclamation"></i>
                                     </b>
                                 {% endif %} 
-                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}">{{ member.member.firstname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}"{% if member.member.isNew %} class="blue-link"{% endif %}>{{ member.member.firstname }}</a>
                             </td>
                             <td>
-                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}">{{ member.member.lastname }}</a>
+                                <a href="{{ path('memberGeneral', {'member': member.member.id}) }}"{% if member.member.isNew %} class="blue-link"{% endif %}>{{ member.member.lastname }}</a>
                             </td>
                             <td>{{ member.counter }}</td>
                             <td>{{ member.ratio }}</td>

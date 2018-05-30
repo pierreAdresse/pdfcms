@@ -477,28 +477,4 @@ class Member
     {
         return $this->memberSpecialties;
     }
-
-    /**
-     * Set isNew
-     *
-     * @param boolean $isNew
-     *
-     * @return Member
-     */
-    public function setIsNew($isNew)
-    {
-        $this->isNew = $isNew;
-
-        return $this;
-    }
-
-    /**
-     * Get isNew
-     *
-     * @return boolean
-     */
-    public function getIsNew()
-    {
-        return $this->isNew;
-    }
 }

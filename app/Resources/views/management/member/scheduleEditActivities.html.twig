@@ -36,9 +36,9 @@
                                 {% if schedule.member %}
                                     {% if schedule.activity == activity %}
                                         {% if schedule.member.deleted %}
-                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                            {% if schedule.member.isNew %}<span class="blue-span">{% endif %}{{ schedule.member.firstname }} {{ schedule.member.lastname }}{% if schedule.member.isNew %}</span>{% endif %}
                                         {% else %}
-                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> {% if schedule.specialty %}({{ schedule.specialty.name }}){% endif %}
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}"{% if schedule.member.isNew %} class="blue-link"{% endif %}>{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> {% if schedule.specialty %}({{ schedule.specialty.name }}){% endif %}
                                         {% endif %}
                                         |
                                     {% endif %}
@@ -74,9 +74,9 @@
                                 {% if schedule.member %}
                                     {% if schedule.specialty == specialty %}
                                         {% if schedule.member.deleted %}
-                                            {{ schedule.member.firstname }} {{ schedule.member.lastname }}
+                                            {% if schedule.member.isNew %}<span class="blue-span">{% endif %}{{ schedule.member.firstname }} {{ schedule.member.lastname }}{% if schedule.member.isNew %}</span>{% endif %}
                                         {% else %}
-                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a>
+                                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}"{% if schedule.member.isNew %} class="blue-link"{% endif %}>{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a>
                                         {% endif %}
                                         |
                                     {% endif %}
@@ -94,9 +94,9 @@
                 {% if schedule.member %}
                     {% if schedule.activity is null %}
                         {% if schedule.member.deleted == 0 %}
-                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}">{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> |
+                            <a href="{{ path('memberGeneral', {'member': schedule.member.id}) }}"{% if schedule.member.isNew %} class="blue-link"{% endif %}>{{ schedule.member.firstname }} {{ schedule.member.lastname }}</a> |
                         {% else %}
-                            {{ schedule.member.firstname }} {{ schedule.member.lastname }} |
+                            {% if schedule.member.isNew %}<span class="blue-span">{% endif %}{{ schedule.member.firstname }} {{ schedule.member.lastname }}{% if schedule.member.isNew %}</span>{% endif %} |
                         {% endif %}
                     {% endif %}
                 {% endif %}

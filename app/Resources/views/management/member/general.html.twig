@@ -57,6 +57,25 @@
 
                 <hr>
 
+                <h3>Nouveau</h3>
+                <p>{% if member.isNew %}Oui{% else %}Non{% endif %}</p>
+
+                {% if is_granted('ROLE_ADMIN') %}
+                    <div class="row uniform">
+                        <div class="5u 12u$(medium)">
+                        </div>
+                        <div class="7u 12u$(medium)">
+                            <p>
+                                <a class="button fit" href="{{ path('memberEditNew', {'member': member.id}) }}">
+                                    Modifier
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <hr>
+
                 <h3>Compétence principale</h3>
                 <p>{% if member.mainSkill is not null %}{{ member.mainSkill.name }}{% else %}Aucune{% endif %}</p>
 

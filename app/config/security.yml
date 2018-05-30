@@ -29,6 +29,7 @@ security:
         - { path: ^/identification$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_SUPER_ADMIN }
         - { path: /editer-competences, role: ROLE_ADMIN }
+        - { path: /editer-nouveau, role: ROLE_ADMIN }
         - { path: /editer-specialites, role: ROLE_ADMIN }
         - { path: /editer-planning, role: ROLE_PLANNING }
         - { path: /editer-role/, role: ROLE_ADMIN }

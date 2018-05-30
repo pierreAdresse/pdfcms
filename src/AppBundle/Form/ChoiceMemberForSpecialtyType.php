@@ -23,7 +23,11 @@ class ChoiceMemberForSpecialtyType extends AbstractType
                     if (is_null($member)) {
                         return '';
                     } else {
-                        return $member->getFirstname().' '.$member->getLastname();
+                        $new = '';
+                        if ($member->getIsNew()) {
+                            $new = ' #NOUVEAU#';
+                        }
+                        return $member->getFirstname().' '.$member->getLastname().$new;
                     }
                 },
                 'data' => null,

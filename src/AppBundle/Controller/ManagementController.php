@@ -368,7 +368,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/repartition-roles", name="memberActivityDivision")
      */
-    public function activityDivisionAction(CinescenieService $serviceCinescenie, Date $serviceDate, MemberService $serviceMember, Request $request)
+    public function activityDivisionAction(CinescenieService $serviceCinescenie, Date $serviceDate, MemberService $serviceMember, Request $request, Logn $log)
     {
         $cinescenies = $serviceCinescenie->getFutures();
 
@@ -379,6 +379,9 @@ class ManagementController extends Controller
             $em         = $this->getDoctrine()->getManager();
             $data       = $form->getData();
             $cinescenie = $data['cinescenie'];
+
+            $messageLog = 'Répartition à partir de '.$cinescenie->getDate()->format('d/m/Y').' ('.$cinescenie->getId().')';
+            $log->log($this->getUser(), $messageLog, 'Répartition');
 
             $activities = $this->getDoctrine()
                 ->getRepository('AppBundle:Activity')
@@ -954,12 +957,21 @@ class ManagementController extends Controller
             }
 
             // Ajouter la compétence principale
-            // Le test est en commentaire car on peut très bien vouloir enlever la compétence principale
             $mainSkill = $data['mainSkill'];
-            //if (!is_null($mainSkill)) {
+            $msBefore  = '';
+            $msAfter   = '';
+            $mainSk    = $member->getMainSkill();
+            if (!is_null($mainSk)) {
+                $msBefore = $mainSk->getName().' ('.$mainSk->getId().')';
+            }
+
+            if (!is_null($mainSkill)) {
+                $msAfter = $mainSkill->getName().' ('.$mainSkill->getId().')';
+            }
+
+            $messageLog .= '### compétence princale avant et après : '.$msBefore.' / '.$msAfter;
                 $member->setMainSkill($mainSkill);
                 $em->persist($member);
-            //}
 
             $em->flush();
 

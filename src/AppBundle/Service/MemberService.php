@@ -126,7 +126,7 @@ class MemberService
         Membres dont le nombre de fois fait le groupe de rôle est le plus petit
         Membres dont le nombre de fois fait le rôle est le plus petit
     */
-    public function filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies)
+    public function filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies, $byPass = false)
     {
         // Membres présents et qui ne sont pas déjà sélectionnés
         $presenceMembers = $this->filterByPresence($members, $cinescenie, $membersSelected);
@@ -151,12 +151,16 @@ class MemberService
             return $diffLastActMembers[0];
         }
 
-        // Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
-        $ratioMembers = $this->orderByRatio($diffLastActMembers, $cinescenie, $date); 
+        if (!$byPass) {
+            // Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
+            $ratioMembers = $this->orderByRatio($diffLastActMembers, $cinescenie, $date); 
 
-        if (count($ratioMembers) == 1) {
-            // Un seul membre disponible le rôle est pour lui
-            return $ratioMembers[0];
+            if (count($ratioMembers) == 1) {
+                // Un seul membre disponible le rôle est pour lui
+                return $ratioMembers[0];
+            }
+        } else {
+            $ratioMembers = $diffLastActMembers;
         }
 
         // Membres dont le nombre de fois fait le rôle est le plus petit

@@ -14,10 +14,11 @@ class Logn
         $this->em          = $em;
     }
 
-    public function log($user, $message)
+    public function log($user, $message, $type = 'Inconnu')
     {
         $log = new Log();
         $log->setUser($user);
+        $log->setType($type);
         $log->setMessage($message);
         $log->setDate(new \Datetime('now'));
 

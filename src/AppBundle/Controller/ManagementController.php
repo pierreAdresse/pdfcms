@@ -469,7 +469,7 @@ class ManagementController extends Controller
                         ->getForDivisionT1($pastCinescenies, $skills, $activity, $serviceCinescenie->getQuota())
                     ;
                     $memberResult = $serviceMember
-                        ->filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies)
+                        ->filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies, true)
                     ;
 
                     if (!is_null($memberResult)) {
@@ -853,7 +853,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/{member}/editer-specialites", name="memberEditSpecialties")
      */
-    public function editSpecialtiesAction(Request $request, Member $member)
+    public function editSpecialtiesAction(Request $request, Member $member, Logn $log)
     {
         $specialties = $this->getDoctrine()
           ->getRepository('AppBundle:Specialty')
@@ -871,16 +871,21 @@ class ManagementController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
+            $messageLog = 'Mise à jour des spécialités de '.$member->getFirstname().' '.$member->getLastname().' ('.$member->getId().'). ### Spécialités avant : ';
+
             // Supprimer les spécialités
             $memberSpecialties = $member->getMemberSpecialties();
             foreach ($memberSpecialties as $memberSpecialty) {
+                $messageLog .= $memberSpecialty->getSpecialty()->getName().' ('.$memberSpecialty->getSpecialty()->getId().'), ';
                 $em->remove($memberSpecialty);
             }
 
             // Ajouter les spécialités
-            $data = $form->getData();
+            $data        = $form->getData();
             $specialties = $data['specialties'];
+            $messageLog .= '### spécialités après : ';
             foreach ($specialties as $specialty) {
+                $messageLog .= $specialty->getName().' ('.$specialty->getId().'), ';
                 $memberSpecialty = new MemberSpecialty();
                 $memberSpecialty->setMember($member);
                 $memberSpecialty->setSpecialty($specialty);
@@ -888,6 +893,8 @@ class ManagementController extends Controller
             }
 
             $em->flush();
+
+            $log->log($this->getUser(), $messageLog, 'Membre spécialités');
 
             $this->addFlash(
                 'notice',
@@ -907,7 +914,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/{member}/editer-competences", name="memberEditSkills")
      */
-    public function editSkillsAction(Request $request, Member $member)
+    public function editSkillsAction(Request $request, Member $member, Logn $log)
     {
         $skills = $this->getDoctrine()
           ->getRepository('AppBundle:Skill')
@@ -925,16 +932,21 @@ class ManagementController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
 
+            $messageLog = 'Mise à jour des compétences de '.$member->getFirstname().' '.$member->getLastname().' ('.$member->getId().'). Compétences avant : ';
+
             // Supprimer les compétences
             $memberSkills = $member->getMemberSkills();
             foreach ($memberSkills as $memberSkill) {
+                $messageLog .= $memberSkill->getSkill()->getName().' ('.$memberSkill->getSkill()->getId().'), ';
                 $em->remove($memberSkill);
             }
 
             // Ajouter les compétences
-            $data = $form->getData();
-            $skills = $data['skills'];
+            $data        = $form->getData();
+            $skills      = $data['skills'];
+            $messageLog .= '### compétences après : ';
             foreach ($skills as $skill) {
+                $messageLog .= $skill->getName().' ('.$skill->getId().'), ';
                 $memberSkill = new MemberSkill();
                 $memberSkill->setMember($member);
                 $memberSkill->setSkill($skill);
@@ -950,6 +962,8 @@ class ManagementController extends Controller
             //}
 
             $em->flush();
+
+            $log->log($this->getUser(), $messageLog, 'Membre compétences');
 
             $this->addFlash(
                 'notice',
@@ -969,7 +983,7 @@ class ManagementController extends Controller
     /**
      * @Route("/gestion/membres/{member}/editer-nouveau", name="memberEditNew")
      */
-    public function editNewAction(Request $request, Member $member)
+    public function editNewAction(Request $request, Member $member, Logn $log)
     {
         $form = $this->createForm(ChoiceNewType::class, $member);
         $form->handleRequest($request);
@@ -980,6 +994,13 @@ class ManagementController extends Controller
 
             $em->persist($member);
             $em->flush();
+
+            $isNewString = 'Non';
+            if ($member->getIsNew()) {
+                $isNewString = 'Oui';
+            }
+            $messageLog = 'Mise à jour du boolean isNew à "'.$isNewString.'" de '.$member->getFirstname().' '.$member->getLastname().' ('.$member->getId().')';
+            $log->log($this->getUser(), $messageLog, 'Membre nouveau');
 
             $this->addFlash(
                 'notice',
@@ -1066,7 +1087,7 @@ class ManagementController extends Controller
 
             $em->flush();
 
-            $log->log($this->getUser(), $messageLog);
+            $log->log($this->getUser(), $messageLog, 'Planning');
 
             $this->addFlash(
                 'notice',

@@ -15,7 +15,7 @@ class Cinescenie
 	{
 		$this->em          = $em;
         $this->serviceDate = $serviceDate;
-        $this->quota       = 7;
+        $this->quota       = 28;
 	}
 
     /*

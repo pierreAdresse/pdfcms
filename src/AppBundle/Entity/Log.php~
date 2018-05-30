@@ -31,7 +31,7 @@ class Log
     /**
      * @var string
      *
-     * @ORM\Column(name="type", type="string", length=255)
+     * @ORM\Column(name="type", type="string", length=255, unique=true)
      */
     private $type;
 
@@ -128,29 +128,5 @@ class Log
     public function getDate()
     {
         return $this->date;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     *
-     * @return Log
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
-    }
-
-    /**
-     * Get type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 }

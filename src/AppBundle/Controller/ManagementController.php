@@ -1092,6 +1092,8 @@ class ManagementController extends Controller
 
                 if ($cineToAdd->getIsTraining()) {
                     $schedule->setIsTraining(true);
+                } else {
+                    $schedule->setIsTraining(false);
                 }
 
                 $em->persist($schedule);

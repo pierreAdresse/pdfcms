@@ -35,6 +35,15 @@ class Date
         return "$day $dayNum $month $year";
     }
 
+    public function transformDatetimeToStringFrWithoutYear($date)
+    {
+        $day    = $this->getStringDayFr($date);
+        $month  = $this->getStringMonthFr($date);
+        $dayNum = $date->format('j');
+
+        return "$day $dayNum $month";
+    }
+
     private function getStringDayFr($date)
     {
         switch ($date->format('w')) {

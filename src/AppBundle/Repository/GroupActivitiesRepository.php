@@ -38,7 +38,7 @@ class GroupActivitiesRepository extends \Doctrine\ORM\EntityRepository
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT ga.name, COUNT(s) AS numberOfTimes
+            SELECT ga.id, ga.name, COUNT(s) AS numberOfTimes
             FROM AppBundle:GroupActivities ga
             JOIN ga.activities a
             LEFT JOIN a.schedules s WITH (s.member = :member AND s.activity IS NOT NULL)

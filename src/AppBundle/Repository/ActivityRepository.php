@@ -9,7 +9,7 @@ class ActivityRepository extends \Doctrine\ORM\EntityRepository
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
-            SELECT a.name, COUNT(s) AS numberOfTimes
+            SELECT a.id, a.name, COUNT(s) AS numberOfTimes
             FROM AppBundle:Activity a
             LEFT JOIN a.schedules s WITH (s.member = :member AND s.activity IS NOT NULL)
             JOIN s.cinescenie c WITH (c.isTraining = 0)

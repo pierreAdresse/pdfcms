@@ -65,9 +65,14 @@ class ManagementController extends Controller
 
                 $members = '';
                 foreach ($schedules as $schedule) {
-                    $member      = $schedule->getMember();
-                    $firstLetter = substr($member->getLastname(), 0, 1);
-                    $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                    $member = $schedule->getMember();
+
+                    if (!empty($member->getNickname())) {
+                        $members    .= $member->getNickname().', ';
+                    } else {
+                        $firstLetter = substr($member->getLastname(), 0, 1);
+                        $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                    }
                 }
 
                 if (!empty($members)) {
@@ -97,9 +102,14 @@ class ManagementController extends Controller
 
                 $members = '';
                 foreach ($schedules as $schedule) {
-                    $member      = $schedule->getMember();
-                    $firstLetter = substr($member->getLastname(), 0, 1);
-                    $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                    $member = $schedule->getMember();
+
+                    if (!empty($member->getNickname())) {
+                        $members    .= $member->getNickname().', ';
+                    } else {
+                        $firstLetter = substr($member->getLastname(), 0, 1);
+                        $members    .= $member->getFirstname().' '.$firstLetter.', ';
+                    }
                 }
 
                 if (!empty($members)) {
@@ -120,9 +130,14 @@ class ManagementController extends Controller
 
         $members = '';
         foreach ($schedules as $schedule) {
-            $member      = $schedule->getMember();
-            $firstLetter = substr($member->getLastname(), 0, 1);
-            $members    .= $member->getFirstname().' '.$firstLetter.', ';
+            $member = $schedule->getMember();
+
+            if (!empty($member->getNickname())) {
+                $members    .= $member->getNickname().', ';
+            } else {
+                $firstLetter = substr($member->getLastname(), 0, 1);
+                $members    .= $member->getFirstname().' '.$firstLetter.', ';
+            }
         }
 
         if (!empty($members)) {
@@ -137,114 +152,210 @@ class ManagementController extends Controller
         return new BinaryFileResponse('tmpSchedule.xlsx');
     }
 
-    /*
-    public function scheduleExcelAction(Request $request, Cinescenie $cinescenie)
+    /**
+     * @Route("/gestion/membres/tableau-de-bord/statistiques-excel", name="memberDashboardStats")
+     */
+    public function dashboardStatsAction(Request $request, CinescenieService $serviceCinescenie, Date $serviceDate)
     {
-        $activities = $this->getDoctrine()
-            ->getRepository('AppBundle:Activity')
-            ->findBy([
-                'allowForDivision' => true,
-            ], ['orderDisplay' => 'ASC'])
-        ;
-
-        $specialties = $this->getDoctrine()
-            ->getRepository('AppBundle:Specialty')
-            ->findBy([], ['ranking' => 'ASC'])
-        ;
-
-        $schedules = $this->getDoctrine()
-            ->getRepository('AppBundle:Schedule')
-            ->findBy([
-                'cinescenie' => $cinescenie,
-            ])
-        ;
-
-        $spreadsheet = $this->get('phpoffice.spreadsheet')->createSpreadsheet();
-
-        // Rôles
-        $cellY = 1;
-        foreach ($activities as $activity) {
-            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $activity->getName());
-
-            $members = '';
-            foreach ($schedules as $schedule) {
-                $member           = $schedule->getMember();
-                $activitySchedule = $schedule->getActivity();
-
-                if (!is_null($member) && !is_null($activitySchedule) && $activitySchedule->getId() == $activity->getId()) {
-                    $specialty = $schedule->getSpecialty();
-                    
-                    $spe = '';
-                    if (!is_null($specialty)) {
-                        $spe = ' ('.$specialty->getName().')';
-                    }
-                    
-                    $members .= $member->getFirstname().' '.$member->getLastname().$spe.', ';
-                }
-            }
-
-            if (!empty($members)) {
-                $members = substr($members, 0, -2);
-                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
-            }
-
-            $cellY++;
-        }
-
-        // Spécialités
-        $cellY++;
-        foreach ($specialties as $specialty) {
-            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $specialty->getName());
-
-            $members = '';
-            foreach ($schedules as $schedule) {
-                $member           = $schedule->getMember();
-                $specialtySchedule = $schedule->getSpecialty();
-
-                if (!is_null($member) && !is_null($specialtySchedule) && $specialtySchedule->getId() == $specialty->getId()) {      
-                    $members .= $member->getFirstname().' '.$member->getLastname().', ';
-                }
-            }
-
-            if (!empty($members)) {
-                $members = substr($members, 0, -2);
-                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $members);
-            }
-
-            $cellY++;
-        }
-
-        // Sans rôle
-        $cellY++;
-        $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, 'Membres présents sans rôle');
-
-        foreach ($schedules as $schedule) {
-            $member           = $schedule->getMember();
-            $activitySchedule = $schedule->getActivity();
-
-            if (!is_null($member) && is_null($activitySchedule)) {
-                $spreadsheet->getActiveSheet()->setCellValue('B'.$cellY, $member->getFirstname().' '.$member->getLastname());
-                $cellY++;
-            }
-        }
-
-        $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
-        $writerXlsx->save('planning.xlsx');
-
-        /*
+        // Initialisation Excel
         $readerXlsx  = $this->get('phpoffice.spreadsheet')->createReader('Xlsx');
-        $spreadsheet = $readerXlsx->load('destination.xlsx');
+        $spreadsheet = $readerXlsx->load('schedule/Statistiques.xlsx');
 
-        $spreadsheet->getActiveSheet()->setCellValue('B3', 'Test réussi !');
+        // Initialisation des données
+        $cinescenies = $serviceCinescenie->getCurrentsWithoutTraining();
+        $members     = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Member')
+            ->findBy(['deleted' => false], ['firstname' => 'ASC'])
+        ;
+        $cellsX      = [
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ', 'BA', 'BB', 'BC', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BK', 'BL', 'BM', 'BN', 'BO', 'BP', 'BQ', 'BR', 'BS', 'BT', 'BU', 'BV', 'BW', 'BX', 'BY', 'BZ'
+        ];
 
+        // Planning présences
+        $spreadsheet->setActiveSheetIndexByName('Planning présences');
+
+        $posCine  = [];
+        $minCellX = $cellsX[1];
+        $maxCellX = '';
+        $sumCellX = '';
+        foreach ($cinescenies as $key => $cinescenie) {
+            $date = $serviceDate->transformDatetimeToStringFrWithoutYear($cinescenie->getDate());
+            $spreadsheet->getActiveSheet()->setCellValue($cellsX[$key+1].'1', $date);
+            $posCine[$cinescenie->getId()] = $cellsX[$key+1];
+            $maxCellX = $cellsX[$key+1];
+            $sumCellX = $cellsX[$key+2];
+        }
+
+        $cellY = 2;
+        foreach ($members as $member) {
+            $name = $member->getFirstname().' '.$member->getLastname();
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $name);
+
+            $schedules = $member->getSchedules();
+            foreach ($schedules as $schedule) {
+                $cine = $schedule->getCinescenie();
+                
+                if (!$cine->getIsTraining()) {
+                    $cellX = $posCine[$cine->getId()];
+                    $spreadsheet->getActiveSheet()->setCellValue($cellX.$cellY, 1);
+                }
+            }
+
+            // Somme par ligne
+            $formula = '=SUM('.$minCellX.$cellY.':'.$maxCellX.$cellY.')';
+            $spreadsheet->getActiveSheet()->setCellValue($sumCellX.$cellY, $formula);
+
+            $cellY++;
+        }
+
+        // Somme par colonne
+        $maxCellY = $cellY - 1;
+        foreach ($cinescenies as $key => $cinescenie) {
+            $cellX   = $cellsX[$key+1];
+            $formula = '=SUM('.$cellX.'2:'.$cellX.$maxCellY.')';
+            $spreadsheet->getActiveSheet()->setCellValue($cellX.$cellY, $formula);
+        }
+
+        // Mise en forme conditionnelle
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_CELLIS);
+        $conditional->setOperatorType(\PhpOffice\PhpSpreadsheet\Style\Conditional::OPERATOR_LESSTHAN);
+        $conditional->addCondition('15');
+        $conditional->getStyle()->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_RED);
+        $conditional->getStyle()->getFont()->setBold(true);
+
+        $conditionalStyles = $spreadsheet->getActiveSheet()->getStyle($sumCellX.'2')->getConditionalStyles();
+        $conditionalStyles[] = $conditional;
+
+        $spreadsheet->getActiveSheet()->getStyle($sumCellX.'2:'.$sumCellX.$maxCellY)->setConditionalStyles($conditionalStyles);
+
+        // -----------
+
+        // Compétences
+        $spreadsheet->setActiveSheetIndexByName('Compétences');
+
+        $skills = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Skill')
+            ->findAll()
+        ;
+
+        $posSkill = [];
+        foreach ($skills as $key => $skill) {
+            $spreadsheet->getActiveSheet()->setCellValue($cellsX[$key+1].'1', $skill->getName());
+            $posSkill[$skill->getId()] = $cellsX[$key+1];
+        }
+
+        $cellY = 2;
+        foreach ($members as $member) {
+            $name = $member->getFirstname().' '.$member->getLastname();
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $name);
+
+            $memberSkills = $member->getMemberSkills();
+            $skills       = [];
+            foreach ($memberSkills as $memberSkill) {
+                $skills[] = $memberSkill->getSkill();
+            }
+
+            $mainSkill = $member->getMainSkill();
+
+            foreach ($skills as $skill) {
+                $flag  = 1;
+                $cellX = $posSkill[$skill->getId()];
+                
+                if (!is_null($mainSkill) && $mainSkill->getId() == $skill->getId()) {
+                    $flag = 'P';
+                    $spreadsheet->getActiveSheet()->getStyle($cellX.$cellY)->getFont()->setBold(true);
+                }
+                
+                $spreadsheet->getActiveSheet()->setCellValue($cellX.$cellY, $flag);
+            }
+
+            $cellY++;
+        }
+
+        // -----------
+
+        // Stats rôles
+        $spreadsheet->setActiveSheetIndexByName('Stats rôles');
+
+        $activities = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:Activity')
+            ->findBy(['allowForDivision' => true], ['orderDisplay' => 'ASC'])
+        ;
+
+        $posActivity = [];
+        foreach ($activities as $key => $activity) {
+            $spreadsheet->getActiveSheet()->setCellValue($cellsX[$key+1].'1', $activity->getName());
+            $posActivity[$activity->getId()] = $cellsX[$key+1];
+        }
+
+        $cellY = 2;
+        foreach ($members as $member) {
+            $name = $member->getFirstname().' '.$member->getLastname();
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $name);
+
+            $stats = $this->getDoctrine()
+                ->getRepository('AppBundle:Activity')
+                ->getSchedulesForMember($member)
+            ;
+
+            foreach ($stats as $stat) {
+                $cellX = $posActivity[$stat['id']];
+                $spreadsheet->getActiveSheet()->setCellValue($cellX.$cellY, $stat['numberOfTimes']);
+            }
+
+            $cellY++;
+        }
+
+        // -----------
+
+        // Stats groupes de rôles
+        $spreadsheet->setActiveSheetIndexByName('Stats groupes de rôles');
+
+        $groupActivities = $this
+            ->getDoctrine()
+            ->getRepository('AppBundle:GroupActivities')
+            ->findAll()
+        ;
+
+        $posGroupActivities = [];
+        foreach ($groupActivities as $key => $groupActivity) {
+            // Petit byPass en dur pour enlever les groupes suppléant et laissez passer
+            if ($groupActivity->getId() != 8 && $groupActivity->getId() != 9) {
+                $spreadsheet->getActiveSheet()->setCellValue($cellsX[$key+1].'1', $groupActivity->getName());
+                $posGroupActivities[$groupActivity->getId()] = $cellsX[$key+1];
+            }
+        }
+
+        $cellY = 2;
+        foreach ($members as $member) {
+            $name = $member->getFirstname().' '.$member->getLastname();
+            $spreadsheet->getActiveSheet()->setCellValue('A'.$cellY, $name);
+
+            $gaStats = $this->getDoctrine()
+                ->getRepository('AppBundle:GroupActivities')
+                ->getSchedulesForMember($member)
+            ;
+
+            foreach ($gaStats as $gaStat) {
+                $cellX = $posGroupActivities[$gaStat['id']];
+                $spreadsheet->getActiveSheet()->setCellValue($cellX.$cellY, $gaStat['numberOfTimes']);
+            }
+
+            $cellY++;
+        }
+
+        $spreadsheet->setActiveSheetIndexByName('Planning présences');
+
+        // Ecriture
         $writerXlsx = $this->get('phpoffice.spreadsheet')->createWriter($spreadsheet, 'Xlsx');
-        $writerXlsx->save('destination.xlsx');
-        */
-        /*
-        return new BinaryFileResponse('planning.xlsx');
-        //return $this->render('management/member/excel.html.twig');
+        $writerXlsx->save('tmpSchedule2.xlsx');
+
+        return new BinaryFileResponse('tmpSchedule2.xlsx');
     }
-    */
 
     /**
      * @Route("/gestion/membres/tableau-de-bord", name="memberDashboard")
@@ -969,7 +1080,7 @@ class ManagementController extends Controller
                 $msAfter = $mainSkill->getName().' ('.$mainSkill->getId().')';
             }
 
-            $messageLog .= '### compétence princale avant et après : '.$msBefore.' / '.$msAfter;
+            $messageLog .= '### compétence principale avant et après : '.$msBefore.' / '.$msAfter;
                 $member->setMainSkill($mainSkill);
                 $em->persist($member);
 

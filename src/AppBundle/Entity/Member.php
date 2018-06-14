@@ -121,6 +121,13 @@ class Member
      */
     private $deleted;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nickname", type="string", length=255)
+     */
+    private $nickname;
+
     public function __construct() {
         $this->shedules     = new ArrayCollection();
         $this->memberSkills = new ArrayCollection();
@@ -500,5 +507,29 @@ class Member
     public function getIsNew()
     {
         return $this->isNew;
+    }
+
+    /**
+     * Set nickname
+     *
+     * @param string $nickname
+     *
+     * @return Member
+     */
+    public function setNickname($nickname)
+    {
+        $this->nickname = $nickname;
+
+        return $this;
+    }
+
+    /**
+     * Get nickname
+     *
+     * @return string
+     */
+    public function getNickname()
+    {
+        return $this->nickname;
     }
 }

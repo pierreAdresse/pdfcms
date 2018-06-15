@@ -18,7 +18,7 @@ class GroupActivitiesRepository extends \Doctrine\ORM\EntityRepository
             SELECT ga, COUNT(s) AS numberOfTimes
             FROM AppBundle:GroupActivities ga
             JOIN ga.activities a
-            LEFT JOIN a.schedules s WITH (s.member = :member)
+            LEFT JOIN a.schedules s WITH (s.member = :member AND s.isTraining = 0)
             JOIN a.skillActivities sa WITH (sa.skill IN (:skills))
             WHERE a.allowForDivision = 1
             GROUP BY ga.id
@@ -27,6 +27,28 @@ class GroupActivitiesRepository extends \Doctrine\ORM\EntityRepository
         )->setParameters([
             'member' => $member,
             'skills' => $skills,
+        ]);
+        $groupActivities = $query->getResult();
+
+        return $groupActivities;
+    }
+
+    public function getOrderByNumberOfTimesForGroup($groupActivitiesId, $member)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT ga, COUNT(s) AS numberOfTimes
+            FROM AppBundle:GroupActivities ga
+            JOIN ga.activities a
+            LEFT JOIN a.schedules s WITH (s.member = :member AND s.isTraining = 0)
+            WHERE ga.id IN (:groupActivitiesId)
+            GROUP BY ga.id
+            ORDER BY numberOfTimes ASC
+            '
+        )->setParameters([
+            'groupActivitiesId' => $groupActivitiesId,
+            'member'            => $member,
         ]);
         $groupActivities = $query->getResult();
 

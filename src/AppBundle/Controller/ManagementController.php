@@ -544,9 +544,9 @@ class ManagementController extends Controller
                         $membersSelected[]   = $memberResult;
                         $lastGroupActivities = $serviceMember->getLastGroupActivities($memberResult, $cinescenie, $date);
                         $activity            = $serviceMember->getActivityBySpecialityAndLastGroupActivities($memberResult, $specialty, $lastGroupActivities, $activitiesComplete);
+                        $serviceMember->setActivityAndSpecialtyForMember($memberResult, $activity, $specialty, $cinescenie);
 
                         if (!is_null($activity)) {
-                            $serviceMember->setActivityAndSpecialtyForMember($memberResult, $activity, $specialty, $cinescenie);
                             $activitiesComplete[] = $activity->getId();
                         }
                     } else {

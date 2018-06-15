@@ -434,6 +434,105 @@ class MemberService
     // Cette fonction renvoie le rôle d'un membre en fonction d'une spécialité et d'un groupe de rôle à éviter
     public function getActivityBySpecialityAndLastGroupActivities($member, $specialty, $lastGroupActivities, $activitiesComplete)
     {
+        $member = $this
+            ->em
+            ->getRepository('AppBundle:Member')
+            ->find($member)
+        ;
+
+        // Liste des rôles autorisés pour le membre
+        $mainSkill    = $member->getMainSkill();
+        $memberSkills = $member->getMemberSkills();
+        $skills       = [];
+        foreach ($memberSkills as $memberSkill) {
+            $skills[] = $memberSkill->getSkill();
+        }
+
+        $activitiesAllowed = [];
+        foreach ($skills as $skill) {
+            // Réduction de la liste des rôles autorisés si le membre à une compétence principale
+            //if ((!is_null($mainSkill) && $mainSkill->getId() == $skill->getId()) || is_null($mainSkill)) {
+                $skillActivities = $skill->getSkillActivities();
+
+                foreach ($skillActivities as $skillActivity) {
+                    $activitiesAllowed[] = $skillActivity->getActivity()->getId();
+                }
+            //}
+        }
+
+        // Liste des rôles possibles en comparant avec ceux autorisés par la spécialité
+        $specialtyActivities = $specialty->getSpecialtyActivities();
+
+        $activitiesAvailable   = [];
+        $activitiesAvailableId = [];
+        foreach ($specialtyActivities as $specialtyActivity) {
+            $activity = $specialtyActivity->getActivity();
+
+            if (in_array($activity->getId(), $activitiesAllowed)) {
+                $activitiesAvailable[]   = $activity;
+                $activitiesAvailableId[] = $activity->getId();
+            }
+        }
+
+        if (empty($activitiesAvailable)) {
+            return null;
+        }
+
+        // Tentative de ne garder que des rôles dont le groupe n'a pas été fait la dernière fois
+        // s'il n'y a plus de rôles alors on garder ceux déjà fait
+        $activitiesResult = [];
+        if (!is_null($lastGroupActivities)) {
+            foreach ($activitiesAvailable as $activityAvailable) {
+                $groupActivities = $activityAvailable->getGroupActivities();
+                if ($lastGroupActivities->getId() != $groupActivities->getId()) {
+                    $activitiesResult[]   = $activityAvailable;
+                    $activitiesResultId[] = $activityAvailable->getId();
+                }
+            }
+        }
+
+        if (empty($activitiesResult)) {
+            $activitiesResult   = $activitiesAvailable;
+            $activitiesResultId = $activitiesAvailableId;
+        }
+
+        // Récupération des groupes de rôles
+        $groupActivitiesAllowed = [];
+        foreach ($activitiesResult as $activityResult) {
+            $groupActivitiesId = $activityResult->getGroupActivities()->getId();
+            if (!in_array($groupActivitiesId, $groupActivitiesAllowed)) {
+                $groupActivitiesAllowed[] = $groupActivitiesId;
+            }
+        }
+
+        // Chercher le groupe de rôle le moins fait dans ceux possibles
+        $groupActivities = $this
+            ->em
+            ->getRepository('AppBundle:GroupActivities')
+            ->getOrderByNumberOfTimesForGroup($groupActivitiesAllowed, $member)
+        ;
+        $groupActivities = $groupActivities[0][0];
+
+        // Ne garder que les rôles de ce groupe
+        $activitiesInGroup = [];
+        $activities        = $groupActivities->getActivities();
+        foreach ($activities as $activity) {
+            if (in_array($activity->getId(), $activitiesResultId)) {
+                $activitiesInGroup[] = $activity->getId();
+            }
+        }
+
+        // Dans ce groupe de rôle chercher le rôle le moins fait
+        $activities = $this
+            ->em
+            ->getRepository('AppBundle:Activity')
+            ->getOrderByNumberOfTimesForMemberAndActivities($member, $activitiesInGroup)
+        ;
+
+        return $activities[0][0];
+
+        // ------
+        /*
         $specialtyActivities = $specialty->getSpecialtyActivities();
 
         $speActivitiesLast      = [];
@@ -475,7 +574,6 @@ class MemberService
 
         if (is_null($resultGroupActivities)) {
             $resultGroupActivities = $lastGroupActivities;
-            $speActivitiesLast     = $speActivities;
         }
 
         $activities = $this
@@ -486,13 +584,14 @@ class MemberService
 
         $resultActivity = null;
         foreach ($activities as $activity) {
-            if (!in_array($activity[0]->getId(), $activitiesComplete) && ((empty($speActivitiesLast) || in_array($activity[0]->getId(), $speActivitiesLast)))) {
+            if (!in_array($activity[0]->getId(), $activitiesComplete) && ((empty($speActivitiesLast) && in_array($activity[0]->getId(), $speActivities)) || (in_array($activity[0]->getId(), $speActivitiesLast)))) {
                 $resultActivity = $activity[0];
                 break;
             }
         }
 
         return $resultActivity;
+        */
     }
 
     // Choix des spécialistes

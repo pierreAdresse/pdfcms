@@ -140,6 +140,9 @@ class ManagementController extends Controller
             }
         }
 
+        // Mise à l'échelle pour l'impression
+        $spreadsheet->getActiveSheet()->getPageSetup()->setScale(53);
+
         if (!empty($members)) {
             $members = substr($members, 0, -2);
             $spreadsheet->getActiveSheet()->setCellValue('E35', $members);

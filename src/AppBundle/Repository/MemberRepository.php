@@ -266,20 +266,24 @@ class MemberRepository extends \Doctrine\ORM\EntityRepository
 
     public function getWithoutSpecialty($cinescenie, $members)
     {
+        $where  = '';
+        $params = ['cinescenie' => $cinescenie];
+        if (!empty($members)) {
+            $where = 'AND m NOT IN (:members)';
+            $params['members'] = $members;
+        }
+
         $em = $this->getEntityManager();
         $query = $em->createQuery(
             '
             SELECT m
             FROM AppBundle:Member m
             JOIN m.schedules sc WITH (sc.cinescenie = :cinescenie)
-            WHERE m NOT IN (:members)
-            AND m.deleted = 0
+            WHERE m.deleted = 0
+            '.$where.'
             ORDER BY m.firstname ASC
             '
-        )->setParameters([
-            'cinescenie' => $cinescenie,
-            'members'    => $members,
-        ]);
+        )->setParameters($params);
         $members = $query->getResult();
 
         return $members;

@@ -41,7 +41,7 @@ class ManagementController extends Controller
 
         // Date
         $date = $serviceDate->transformDatetimeToStringFr($cinescenie->getDate());
-        $spreadsheet->getActiveSheet()->setCellValue('I1', $date);
+        $spreadsheet->getActiveSheet()->setCellValue('J1', $date);
 
         // Rôles
         $activities = $this->getDoctrine()
@@ -145,7 +145,7 @@ class ManagementController extends Controller
 
         if (!empty($members)) {
             $members = substr($members, 0, -2);
-            $spreadsheet->getActiveSheet()->setCellValue('E35', $members);
+            $spreadsheet->getActiveSheet()->setCellValue('F35', $members);
         }
 
         // Ecriture

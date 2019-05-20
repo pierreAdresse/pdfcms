@@ -145,7 +145,7 @@ class ManagementController extends Controller
 
         if (!empty($members)) {
             $members = substr($members, 0, -2);
-            $spreadsheet->getActiveSheet()->setCellValue('F35', $members);
+            $spreadsheet->getActiveSheet()->setCellValue('F36', $members);
         }
 
         // Ecriture

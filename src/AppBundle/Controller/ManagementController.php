@@ -518,11 +518,42 @@ class ManagementController extends Controller
                 
             $serviceMember->cleanSchedules($cinesceniesWithoutTraining);
 
+            // Algo V3
+            $groupActivities = $this
+                ->getDoctrine()
+                ->getRepository('AppBundle:GroupActivities')
+                ->findAll()
+            ;
+
             foreach($cinesceniesWithoutTraining as $key => $cinescenie) {
                 // Permet de ne pas dépasser la mémoire allouée
                 set_time_limit(120);
 
                 $pastCinescenies = $serviceCinescenie->getCinesceniesBetween($date, $cinescenie->getDate());
+
+                // ---------------------------------
+
+                /* Algo V3
+                    On récupère la liste des groupes de rôles
+                    On les ordonne en mettant celui ou il y a le moins de personnes présentes à la date pour les compétences demandées en priorité
+                    On récupère le nombre de personnes nécéssaire pour tous les rôles du groupe (+ 1 ou 2) dont le ratio de présence est le plus bas
+                    On calcule pour chaque personne et chaque rôle du groupe le ratio de quand les personnes devraient faire le rôle (répartition homogène)
+                     et le plus petit de tous prend le rôle, puis on passe au rôle suivant, etc ...
+
+                    Récupération des skills
+                    Ordonner les skills du plus au moins immortant (nom de personnes présentes avec le skill le plus petit)
+                    Etape X : Pour chaque skill récupération des activities
+                    Pour le nombre d'activities + 1 ou 2 récupération des membres dont le ratio de participation est le plus bas
+                    Etape Y : Pour chaque membre et pour chaque activity calcul du ratio de répartition homogène
+                    Affectation de l'activity au membre qui a le ratio de répartition homogène le plus bas
+                    Nettoyage des listes en enlevant le membre et l'activity
+                    Recommencer à l'étape Y, quand plus de membre ou d'activity recommencer à l'étape X, quand plus de skill terminer
+
+                */
+
+                $serviceMember->filterByAlgoV3($cinescenie, $date, $groupActivities, $pastCinescenies);
+
+                // ---------------------------------
 
                 // Choix des spécialistes
                 /*
@@ -532,6 +563,7 @@ class ManagementController extends Controller
                     Membres dont le ratio entre le nombre de séances où ils sont présents et le nombre de séances jouées est le plus petit
                     Choisir un rôle via le groupe de rôle possible qui n'a été fait la dernière fois et le moins fait puis le rôle possible le moins fait 
                 */
+/*
                 $membersSelected    = [];
                 $activitiesComplete = [];
                 foreach ($specialties as $specialty) {
@@ -571,7 +603,7 @@ class ManagementController extends Controller
                     foreach ($skillActivities as $skillActivity) {
                         $skills[] = $skillActivity->getSkill();
                     }
-
+*/
                     // T1
                     /*
                         Membres avec la compétence demandée
@@ -582,17 +614,24 @@ class ManagementController extends Controller
                         Membres dont le nombre de fois fait le groupe de rôle est le plus petit
                         Membres dont le nombre de fois fait le rôle est le plus petit
                     */
+/*                        
                     $members      = $serviceMember
                         ->getForDivisionT1($pastCinescenies, $skills, $activity, $serviceCinescenie->getQuota())
                     ;
+
                     $memberResult = $serviceMember
                         ->filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies, true)
                     ;
-
+*/
+                    /*$memberResult = $serviceMember
+                        ->filterByWeight($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies, true)
+                    ;*/
+/*
                     if (!is_null($memberResult)) {
                         $membersSelected[] = $memberResult;
                         $serviceMember->setActivityForMember($memberResult, $activity, $cinescenie);
                     } else {
+*/
                         // T2
                         /*
                             Membres avec la compétence demandée
@@ -602,20 +641,26 @@ class ManagementController extends Controller
                             Membres dont le nombre de fois fait le groupe de rôle est le plus petit
                             Membres dont le nombre de fois fait le rôle est le plus petit
                         */
+/*
                         $members      = $serviceMember
                             ->getForDivisionT2($skills)
                         ;
                         $memberResult = $serviceMember
                             ->filterBy($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies)
                         ;
-
+*/
+                        /*$memberResult = $serviceMember
+                            ->filterByWeight($members, $membersSelected, $cinescenie, $date, $activity, $pastCinescenies)
+                        ;*/
+/*
                         if (!is_null($memberResult)) {
                             $membersSelected[] = $memberResult;
                             $serviceMember->setActivityForMember($memberResult, $activity, $cinescenie);
                         }
+
                     }
                 }
-
+*/
                 $em->flush();
             }
 

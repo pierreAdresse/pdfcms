@@ -64,4 +64,23 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
 
         return $schedules;
     }
+
+    public function getForMemberAndActivities($member, $activities)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT s
+            FROM AppBundle:Schedule s
+            WHERE s.activity IN (:activities)
+            AND s.member = :member
+            '
+        )->setParameters([
+            'member'      => $member,
+            'activities' => $activities
+        ]);
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
 }

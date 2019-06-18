@@ -334,7 +334,89 @@ class MemberService
                     unset($activities[$keyActivity]);
                 } else {
                     $members = null;
-                    $activities = null;
+                    //$activities = null;
+                }
+            }
+
+            if (count($activities) > 0) {
+                // On recommence si toutes les activités ne sont pas remplies
+                $nbActivities = count($activities);
+                $nbActivitiesPlus = $nbActivities + 2; // équivalent à + 2 car les array commencent à 0
+
+                // ### Pour le nombre d'activities + 1 ou 2 récupération des membres dont le ratio de participation est le plus bas
+                $members = $this->getForDivisionT2($skill);
+                $membersPresents = $this->filterByPresence($members, $cinescenie, $membersSelected);
+
+                $totalCineMembers = $this
+                    ->em
+                    ->getRepository('AppBundle:Member')
+                    ->getTotalCineByMember($membersPresents, $date, $cinescenie->getDate())
+                ;
+
+                $totalCinePlayMembers = $this
+                    ->em
+                    ->getRepository('AppBundle:Member')
+                    ->getTotalCinePlayByMember($membersPresents, $date, $cinescenie->getDate())
+                ;
+
+                $membersRatio = [];
+                foreach ($totalCineMembers as $key => $totalCineMember) {
+                    // Nombre de personnes pour la compétence du rôle
+                    $numberMembersForSkill = count($skill->getMemberSkills());
+
+                    $isFind = false;
+                    foreach ($totalCinePlayMembers as $totalCinePlayMember) {
+                        if ($totalCinePlayMember['id'] == $totalCineMember['id']) {
+                            $totalCinePlay = $totalCinePlayMember['totalCinePlay'];
+                            $isFind = true;
+                            break;
+                        }
+                    }
+
+                    if ($isFind) {
+                        $ratio = round($totalCinePlay / $totalCineMember['totalCine'] * 100, 0);
+                    } else {
+                        $ratio = 0;
+                    }
+
+                    $membersRatio[$key]['id']      = $totalCineMember['id'];
+                    $membersRatio[$key]['counter'] = $ratio;
+                }
+
+                // Tri par ordre croissant du ratio
+                $counter = [];
+                foreach ($membersRatio as $key => $row) {
+                    $id[$key]      = $row['id'];
+                    $counter[$key] = $row['counter'];
+                }
+                array_multisort($counter, SORT_ASC, $membersRatio);
+
+                // Réduction du nombre de membres
+                $membersPresents = array_slice($membersRatio, 0, $nbActivitiesPlus);
+                $members = [];
+                foreach ($membersPresents as $memberPresent) {
+                    $members[] = $memberPresent['id'];
+                }
+
+                // ### Etape Y : Pour chaque membre et pour chaque activity calcul du ratio de répartition homogène
+                while ($members != null && $activities != null && count($members) > 0 && count($activities) > 0) {
+                    $result = $this->getMemberAndActivityWithRatioRepartitionHomogeneMin($members, $activities, $skill, $pastCinescenies);
+
+                    if ($result['memberSelected'] != null && $result['activitySelected'] != null) {
+                        // ### Affectation de l'activity au membre qui a le ratio de répartition homogène le plus bas
+                        $membersSelected[] = $result['memberSelected'];
+                        $this->setActivityForMember($result['memberSelected'], $result['activitySelected'], $cinescenie);
+
+                        // ### Nettoyage des listes en enlevant le membre et l'activity
+                        $keyMember = array_search($result['memberSelected'], $members);
+                        unset($members[$keyMember]);
+
+                        $keyActivity = array_search($result['activitySelected'], $activities);
+                        unset($activities[$keyActivity]);
+                    } else {
+                        $members = null;
+                        //$activities = null;
+                    }
                 }
             }
         }

@@ -26,6 +26,26 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
         return $schedules;
     }
 
+    public function getLastPresence($member, $date)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery(
+            '
+            SELECT s
+            FROM AppBundle:Schedule s
+            JOIN s.cinescenie c WITH (c.date < :date)
+            WHERE s.member = :member
+            ORDER BY c.date DESC
+            '
+        )->setParameters([
+            'member'  => $member,
+            'date'    => $date
+        ]);
+        $schedules = $query->getResult();
+
+        return $schedules;
+    }
+
     public function getLastSpecialty($member, $from, $to)
     {
         $em = $this->getEntityManager();

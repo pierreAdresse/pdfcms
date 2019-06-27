@@ -213,17 +213,28 @@ class MemberService
         Nettoyage des listes en enlevant le membre et l'activity
         Recommencer à l'étape Y, quand plus de membre ou d'activity recommencer à l'étape X, quand plus de skill terminer
     */
-    public function filterByAlgoV3($cinescenie, $date, $groupActivities, $pastCinescenies)
+    public function filterByAlgoV3($cinescenie, $date, $groupActivities)
     {
         // ### Récupération des skills
         // ### Ordonner les skills du plus au moins immortant (nom de personnes présentes avec le skill le plus petit)
         $skillsSorted = $this->sortSkills($cinescenie);
+
+        // Nombre de séances max
+        $cinescenies = $this
+            ->em
+            ->getRepository('AppBundle:Cinescenie')
+            ->findBy(['isTraining' => 0])
+        ;
+        $numberMaxCinescenies = count($cinescenies);
 
         // ### Etape X : Pour chaque skill récupération des activities
         $membersSelected = [];
         foreach ($skillsSorted as $skill) {
             $skill = $skill['id'];
             $skillActivities = $skill->getSkillActivities();
+
+            // Nombre de personnes pour la compétence du rôle
+            $numberMembersForSkill = count($skill->getMemberSkills());
 
             $activities = [];
             foreach ($skillActivities as $skillActivity) {
@@ -232,6 +243,15 @@ class MemberService
 
             $nbActivities = count($activities);
             $nbActivitiesPlus = $nbActivities + 2; // équivalent à + 2 car les array commencent à 0
+
+            // Nombre de rôles disponibles dans la saison
+            $numberActivitiesSaison = $numberMaxCinescenies * count($activities);
+
+            // Nombre de rôles max par membre dans la saison
+            $numberActivitiesByMember = $numberActivitiesSaison / $numberMembersForSkill;
+
+            // Nombre max de fois qu'un rôle peut être attribué
+            $maxActivity = $numberActivitiesByMember / count($activities);
 
             // ### Pour le nombre d'activities + 1 ou 2 récupération des membres dont le ratio de participation est le plus bas
             $members = $this->getForDivisionT2($skill);
@@ -250,27 +270,10 @@ class MemberService
             ;
 
             $membersRatio = [];
+            $membersSameActivities = [];
+            $membersSameActivitiesGreaterThanLimit = [];
+            $membersGreaterThanLimit = [];
             foreach ($totalCineMembers as $key => $totalCineMember) {
-                // Nombre de personnes pour la compétence du rôle
-                $numberMembersForSkill = count($skill->getMemberSkills());
-
-                // Nombre de séances max
-                $cinescenies = $this
-                    ->em
-                    ->getRepository('AppBundle:Cinescenie')
-                    ->findBy(['isTraining' => 0])
-                ;
-                $numberMaxCinescenies = count($cinescenies);
-
-                // Nombre de rôles disponibles dans la saison
-                $numberActivitiesSaison = $numberMaxCinescenies * count($activities);
-
-                // Nombre de rôles max par membre dans la saison
-                $numberActivitiesByMember = $numberActivitiesSaison / $numberMembersForSkill;
-
-                // Nombre max de fois qu'un rôle peut être attribué
-                $maxActivity = $numberActivitiesByMember / count($activities);
-
                 // Nombre de fois à laquelle le membre à déjà fait les rôles
                 $schedulesActivity = $this
                     ->em
@@ -296,9 +299,45 @@ class MemberService
                     $ratio = 0;
                 }
 
-                if ($numberMemberDoActivity < $numberActivitiesByMember) {
-                    $membersRatio[$key]['id']      = $totalCineMember['id'];
-                    $membersRatio[$key]['counter'] = $ratio;
+                // Dernier groupe de rôle
+                $currentGroupActivities = $activities[0]->getGroupActivities();
+                $isSameGroupActivities = false;
+
+                $schedules = $this
+                    ->em
+                    ->getRepository('AppBundle:Schedule')
+                    ->getLastPresence($totalCineMember['id'], $cinescenie->getDate())
+                ;
+
+                if ($schedules != null) {
+                    $lastActivity = $schedules[0]->getActivity();
+                    $lastGroupActivities = null;
+
+                    if ($lastActivity != null) {
+                        $lastGroupActivities = $lastActivity->getGroupActivities();
+
+                        if ($lastGroupActivities->getId() == $currentGroupActivities->getId()) {
+                            $isSameGroupActivities = true;
+                        }
+                    }
+                }
+
+                if ($isSameGroupActivities) {
+                    if ($numberMemberDoActivity <= $numberActivitiesByMember) {
+                        $membersSameActivities[$key]['id']      = $totalCineMember['id'];
+                        $membersSameActivities[$key]['counter'] = $ratio;
+                    } else {
+                        $membersSameActivitiesGreaterThanLimit[$key]['id']      = $totalCineMember['id'];
+                        $membersSameActivitiesGreaterThanLimit[$key]['counter'] = $ratio; 
+                    }
+                } else {
+                    if ($numberMemberDoActivity <= $numberActivitiesByMember) {
+                        $membersRatio[$key]['id']      = $totalCineMember['id'];
+                        $membersRatio[$key]['counter'] = $ratio;
+                    } else {
+                        $membersGreaterThanLimit[$key]['id']      = $totalCineMember['id'];
+                        $membersGreaterThanLimit[$key]['counter'] = $ratio;
+                    }
                 }
             }
 
@@ -310,8 +349,31 @@ class MemberService
             }
             array_multisort($counter, SORT_ASC, $membersRatio);
 
+            $counter = [];
+            foreach ($membersSameActivities as $key => $row) {
+                $id[$key]      = $row['id'];
+                $counter[$key] = $row['counter'];
+            }
+            array_multisort($counter, SORT_ASC, $membersSameActivities);
+
+            $counter = [];
+            foreach ($membersSameActivitiesGreaterThanLimit as $key => $row) {
+                $id[$key]      = $row['id'];
+                $counter[$key] = $row['counter'];
+            }
+            array_multisort($counter, SORT_ASC, $membersSameActivitiesGreaterThanLimit);
+
+            $counter = [];
+            foreach ($membersGreaterThanLimit as $key => $row) {
+                $id[$key]      = $row['id'];
+                $counter[$key] = $row['counter'];
+            }
+            array_multisort($counter, SORT_ASC, $membersGreaterThanLimit);
+
+            $combinedMembers = array_merge($membersRatio, $membersGreaterThanLimit, $membersSameActivities, $membersSameActivitiesGreaterThanLimit);
+
             // Réduction du nombre de membres
-            $membersPresents = array_slice($membersRatio, 0, $nbActivitiesPlus);
+            $membersPresents = array_slice($combinedMembers, 0, $nbActivitiesPlus);
             $members = [];
             foreach ($membersPresents as $memberPresent) {
                 $members[] = $memberPresent['id'];
@@ -319,7 +381,7 @@ class MemberService
 
             // ### Etape Y : Pour chaque membre et pour chaque activity calcul du ratio de répartition homogène
             while ($members != null && $activities != null && count($members) > 0 && count($activities) > 0) {
-                $result = $this->getMemberAndActivityWithRatioRepartitionHomogeneMin($members, $activities, $skill, $pastCinescenies);
+                $result = $this->getMemberAndActivityWithRatioRepartitionHomogeneMin($members, $activities, $numberMembersForSkill, $numberMaxCinescenies, $numberActivitiesSaison, $numberActivitiesByMember, $maxActivity);
 
                 if ($result['memberSelected'] != null && $result['activitySelected'] != null) {
                     // ### Affectation de l'activity au membre qui a le ratio de répartition homogène le plus bas
@@ -333,11 +395,16 @@ class MemberService
                     $keyActivity = array_search($result['activitySelected'], $activities);
                     unset($activities[$keyActivity]);
                 } else {
-                    $members = null;
-                    //$activities = null;
+                    if (count($activities) > 0 && $nbActivitiesPlus <= count($combinedMembers) - 1) {
+                        $membersPresents = array_slice($combinedMembers, $nbActivitiesPlus, 1);
+                        $nbActivitiesPlus++;
+                        $members = $membersPresents[0]['id'];
+                    } else {
+                        $members = null;
+                    }
                 }
             }
-
+            /*
             if (count($activities) > 0) {
                 // On recommence si toutes les activités ne sont pas remplies
                 $nbActivities = count($activities);
@@ -419,13 +486,14 @@ class MemberService
                     }
                 }
             }
+            */
         }
     }
 
-    private function getMemberAndActivityWithRatioRepartitionHomogeneMin($members, $activities, $skill, $pastCinescenies)
+    private function getMemberAndActivityWithRatioRepartitionHomogeneMin($members, $activities, $numberMembersForSkill, $numberMaxCinescenies, $numberActivitiesSaison, $numberActivitiesByMember, $maxActivity)
     {
         // Nombre de personnes pour la compétence du rôle
-        $numberMembersForSkill = count($skill->getMemberSkills());
+        /*$numberMembersForSkill = count($skill->getMemberSkills());
 
         // Nombre de séances max
         $cinescenies = $this
@@ -434,7 +502,7 @@ class MemberService
             ->findBy(['isTraining' => 0])
         ;
         $numberMaxCinescenies = count($cinescenies);
-
+*/
         /*
         // Numéro de cinéscénie en cours
         $numberCurrentCinescenies = count($pastCinescenies);
@@ -454,15 +522,15 @@ class MemberService
         // ----
 
         // Nombre de rôles disponibles dans la saison
-        $numberActivitiesSaison = $numberMaxCinescenies * count($activities);
+        /*$numberActivitiesSaison = $numberMaxCinescenies * count($activities);
 
         // Nombre de rôles max par membre dans la saison
         $numberActivitiesByMember = $numberActivitiesSaison / $numberMembersForSkill;
 
         // Nombre max de fois qu'un rôle peut être attribué
         $maxActivity = $numberActivitiesByMember / count($activities);
-
-        $ratioMin = 1000;
+*/
+        $quantityMin = 1000;
         $result = [];
         $result['memberSelected'] = null;
         $result['activitySelected'] = null;
@@ -498,9 +566,9 @@ class MemberService
 
             // On garde le plus petit ratio de tous avec l'activity et le member
             //if ($ratio < $ratioMin) {
-            if (/*$numberMemberDoActivity < $numberActivitiesByMember && */$numberMemberDoActivity < $ratioMin) {
+            if ($numberMemberDoActivity < $quantityMin) {
                 //$ratioMin = $ratio;
-                $ratioMin = $numberMemberDoActivity;
+                $quantityMin = $numberMemberDoActivity;
                 $result['memberSelected'] = $member;
             }
         }

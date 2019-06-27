@@ -551,7 +551,7 @@ class ManagementController extends Controller
 
                 */
 
-                $serviceMember->filterByAlgoV3($cinescenie, $date, $groupActivities, $pastCinescenies);
+                $serviceMember->filterByAlgoV3($cinescenie, $date, $groupActivities);
 
                 // ---------------------------------
 

@@ -251,7 +251,7 @@ var_dump('Ordre des compétences : '.$listSkills);*/
             // Nombre max de fois qu'un rôle peut être attribué
             $maxActivity = $numberActivitiesByMember / count($activities);
 
-/*var_dump('Pour la compétence : '.$skill->getName().', numberMaxCinescenies: '.$numberMaxCinescenies.', numberMembersForSkill: '.$numberMembersForSkill.', count($activities): '.count($activities).', numberActivitiesSaison: '.$numberActivitiesSaison.', numberActivitiesByMember: '.$numberActivitiesByMember.', maxActivity: '.$maxActivity);*/
+//var_dump('Pour la compétence : '.$skill->getName().', numberMaxCinescenies: '.$numberMaxCinescenies.', numberMembersForSkill: '.$numberMembersForSkill.', count($activities): '.count($activities).', numberActivitiesSaison: '.$numberActivitiesSaison.', numberActivitiesByMember: '.$numberActivitiesByMember.', maxActivity: '.$maxActivity);
 
             // ### Pour le nombre d'activities + 1 ou 2 récupération des membres dont le ratio de participation est le plus bas
             $members = $this->getForDivisionT2($skill);
@@ -576,9 +576,9 @@ var_dump('Ordre des membres : '.$listMembersCombined);*/
 foreach ($activities as $act) {
     $listActivities .= $act->getName().', ';
 }
-var_dump('#### '.$listActivities);
+var_dump('#### '.$listActivities);*/
 
-$listMembersDoActivity .= 'Membre : '.$member.', numberMemberDoActivity: '.$numberMemberDoActivity.', quantityMin: '.$quantityMin.', ';*/
+//$listMembersDoActivity .= 'Membre : '.$member.', numberMemberDoActivity: '.$numberMemberDoActivity.', quantityMin: '.$quantityMin.', ';
 
             // Calcul du ratio entre numberMemberDoActivity et numberMemberShouldPlayActivity
             /*$ratio = 0;
@@ -602,10 +602,15 @@ var_dump('Membre retenu : '.$result['memberSelected']);*/
 //$listActivities = '';
             foreach ($activities as $key => $activity) {
                 // Nombre de fois à laquelle le membre à déjà fait le rôle
-                $schedulesActivity = $this
+                /*$schedulesActivity = $this
                     ->em
                     ->getRepository('AppBundle:Schedule')
                     ->findBy(['member' => $result['memberSelected'], 'activity' => $activity])
+                ;*/
+                $schedulesActivity = $this
+                    ->em
+                    ->getRepository('AppBundle:Schedule')
+                    ->getForMemberAndActivities($result['memberSelected'], $activity)
                 ;
 //$listActivities .= 'Rôle : '.$activity->getName().', count($schedulesActivity): '.count($schedulesActivity).', $maxActivity: '.$maxActivity.' # ';
 

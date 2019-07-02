@@ -213,19 +213,17 @@ class MemberService
         Nettoyage des listes en enlevant le membre et l'activity
         Recommencer à l'étape Y, quand plus de membre ou d'activity recommencer à l'étape X, quand plus de skill terminer
     */
-    public function filterByAlgoV3($cinescenie, $date, $groupActivities)
+    public function filterByAlgoV3($cinescenie, $date, $groupActivities, $numberMaxCinescenies)
     {
         // ### Récupération des skills
         // ### Ordonner les skills du plus au moins immortant (nom de personnes présentes avec le skill le plus petit)
         $skillsSorted = $this->sortSkills($cinescenie);
-
-        // Nombre de séances max
-        $cinescenies = $this
-            ->em
-            ->getRepository('AppBundle:Cinescenie')
-            ->findBy(['isTraining' => 0])
-        ;
-        $numberMaxCinescenies = count($cinescenies);
+/*$listSkills = '';
+foreach ($skillsSorted as $skill) {
+    $skill = $skill['id'];
+    $listSkills .= $skill->getName().', ';
+}
+var_dump('Ordre des compétences : '.$listSkills);*/
 
         // ### Etape X : Pour chaque skill récupération des activities
         $membersSelected = [];
@@ -253,9 +251,17 @@ class MemberService
             // Nombre max de fois qu'un rôle peut être attribué
             $maxActivity = $numberActivitiesByMember / count($activities);
 
+/*var_dump('Pour la compétence : '.$skill->getName().', numberMaxCinescenies: '.$numberMaxCinescenies.', numberMembersForSkill: '.$numberMembersForSkill.', count($activities): '.count($activities).', numberActivitiesSaison: '.$numberActivitiesSaison.', numberActivitiesByMember: '.$numberActivitiesByMember.', maxActivity: '.$maxActivity);*/
+
             // ### Pour le nombre d'activities + 1 ou 2 récupération des membres dont le ratio de participation est le plus bas
             $members = $this->getForDivisionT2($skill);
             $membersPresents = $this->filterByPresence($members, $cinescenie, $membersSelected);
+
+/*$listMembers = '';
+foreach ($membersPresents as $membersPresent) {
+    $listMembers .= $membersPresent.', ';
+}
+var_dump('Membres présents avec la compétence : '.$listMembers);*/
 
             $totalCineMembers = $this
                 ->em
@@ -372,6 +378,13 @@ class MemberService
 
             $combinedMembers = array_merge($membersRatio, $membersGreaterThanLimit, $membersSameActivities, $membersSameActivitiesGreaterThanLimit);
 
+/*$listMembersCombined = '';
+foreach ($combinedMembers as $combinedMember) {
+    $listMembersCombined .= $combinedMember['id'].', ';
+}
+var_dump('Ordre des membres : '.$listMembersCombined);*/
+
+
             // Réduction du nombre de membres
             $membersPresents = array_slice($combinedMembers, 0, $nbActivitiesPlus);
             $members = [];
@@ -394,6 +407,7 @@ class MemberService
 
                     $keyActivity = array_search($result['activitySelected'], $activities);
                     unset($activities[$keyActivity]);
+//var_dump('Membre sélectionné : '.$result['memberSelected'].', activité : '.$result['activitySelected']->getName());
                 } else {
                     if (count($activities) > 0 && $nbActivitiesPlus <= count($combinedMembers) - 1) {
                         $membersPresents = array_slice($combinedMembers, $nbActivitiesPlus, 1);
@@ -534,6 +548,7 @@ class MemberService
         $result = [];
         $result['memberSelected'] = null;
         $result['activitySelected'] = null;
+//$listMembersDoActivity = '';
         foreach ($members as $member) {
             /*
             // Nombre de présences du membre durant la saison
@@ -557,6 +572,13 @@ class MemberService
                 ->getForMemberAndActivities($member, $activities)
             ;
             $numberMemberDoActivity = count($schedulesActivity);
+/*$listActivities = '';
+foreach ($activities as $act) {
+    $listActivities .= $act->getName().', ';
+}
+var_dump('#### '.$listActivities);
+
+$listMembersDoActivity .= 'Membre : '.$member.', numberMemberDoActivity: '.$numberMemberDoActivity.', quantityMin: '.$quantityMin.', ';*/
 
             // Calcul du ratio entre numberMemberDoActivity et numberMemberShouldPlayActivity
             /*$ratio = 0;
@@ -572,9 +594,12 @@ class MemberService
                 $result['memberSelected'] = $member;
             }
         }
+/*var_dump('getMemberAndActivity : '.$listMembersDoActivity);
+var_dump('Membre retenu : '.$result['memberSelected']);*/
 
         if ($result['memberSelected'] != null) {
             $activitySort = [];
+//$listActivities = '';
             foreach ($activities as $key => $activity) {
                 // Nombre de fois à laquelle le membre à déjà fait le rôle
                 $schedulesActivity = $this
@@ -582,12 +607,14 @@ class MemberService
                     ->getRepository('AppBundle:Schedule')
                     ->findBy(['member' => $result['memberSelected'], 'activity' => $activity])
                 ;
+//$listActivities .= 'Rôle : '.$activity->getName().', count($schedulesActivity): '.count($schedulesActivity).', $maxActivity: '.$maxActivity.' # ';
 
                 if (count($schedulesActivity) < $maxActivity) {
                     $activitySort[$key]['id'] = $activity;
                     $activitySort[$key]['counter'] = count($schedulesActivity);
                 }
             }
+//var_dump('Liste des rôels : '.$listActivities);
 
             // Tri par ordre croissant du nombre de fois le rôle déjà fait
             $counter = [];
@@ -600,6 +627,7 @@ class MemberService
             // Rôle assigné
             if (count($activitySort) > 0) {
                 $result['activitySelected'] = $activitySort[0]['id'];
+//var_dump('Rôle sélectionné : '.$result['activitySelected']->getName());
             } else {
                 foreach ($activities as $act) {
                     $result['activitySelected'] = $act;

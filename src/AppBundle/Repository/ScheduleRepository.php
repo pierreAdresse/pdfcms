@@ -35,6 +35,7 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
             FROM AppBundle:Schedule s
             JOIN s.cinescenie c WITH (c.date < :date)
             WHERE s.member = :member
+            AND s.isTraining = 0
             ORDER BY c.date DESC
             '
         )->setParameters([
@@ -94,6 +95,7 @@ class ScheduleRepository extends \Doctrine\ORM\EntityRepository
             FROM AppBundle:Schedule s
             WHERE s.activity IN (:activities)
             AND s.member = :member
+            AND s.isTraining = 0
             '
         )->setParameters([
             'member'      => $member,

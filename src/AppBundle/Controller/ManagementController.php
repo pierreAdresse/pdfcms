@@ -525,12 +525,20 @@ class ManagementController extends Controller
                 ->findAll()
             ;
 
+            // Nombre de séances max
+            $cines = $this
+                ->getDoctrine()
+                ->getRepository('AppBundle:Cinescenie')
+                ->findBy(['isTraining' => 0])
+            ;
+            $numberMaxCinescenies = count($cines);
+
             foreach($cinesceniesWithoutTraining as $key => $cinescenie) {
                 // Permet de ne pas dépasser la mémoire allouée
                 set_time_limit(120);
 
-                $pastCinescenies = $serviceCinescenie->getCinesceniesBetween($date, $cinescenie->getDate());
-
+                //$pastCinescenies = $serviceCinescenie->getCinesceniesBetween($date, $cinescenie->getDate());
+//var_dump('Cinéscénie du '.$cinescenie->getDate()->format('d/m/Y H:i'));
                 // ---------------------------------
 
                 /* Algo V3
@@ -551,7 +559,7 @@ class ManagementController extends Controller
 
                 */
 
-                $serviceMember->filterByAlgoV3($cinescenie, $date, $groupActivities);
+                $serviceMember->filterByAlgoV3($cinescenie, $date, $groupActivities, $numberMaxCinescenies);
 
                 // ---------------------------------
 
